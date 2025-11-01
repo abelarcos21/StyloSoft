@@ -54,37 +54,37 @@
               </li>
               <li class="nav-item">
                 <Link href="/agendas" class="nav-link" :class="{ active: $page.url.startsWith('/agendas') }">
-                  <i class="nav-icon fas fa-cash-register"></i>
+                  <i class="nav-icon fas fa-calendar-alt"></i>
                   <p>Agendas</p>
                 </Link>
               </li>
               <li class="nav-item">
                 <Link href="/productos" class="nav-link" :class="{ active: $page.url.startsWith('/productos') }">
-                  <i class="nav-icon fas fa-box"></i>
+                  <i class="nav-icon fas fa-boxes"></i>
                   <p>Productos</p>
                 </Link>
               </li>
               <li class="nav-item">
                 <Link href="/servicios" class="nav-link" :class="{ active: $page.url.startsWith('/servicios') }">
-                  <i class="nav-icon fas fa-box"></i>
+                  <i class="nav-icon fas fa-hand-sparkles"></i>
                   <p>Servicios</p>
                 </Link>
               </li>
               <li class="nav-item">
                 <Link href="/empleados" class="nav-link" :class="{ active: $page.url.startsWith('/empleados') }">
-                  <i class="nav-icon fas fa-box"></i>
+                  <i class="nav-icon fas fa-users"></i>
                   <p>Empleados</p>
                 </Link>
               </li>
                <li class="nav-item">
                 <Link href="/clientes" class="nav-link" :class="{ active: $page.url.startsWith('/clientes') }">
-                  <i class="nav-icon fas fa-box"></i>
+                  <i class="nav-icon fas fa-user-friends"></i>
                   <p>Clientes</p>
                 </Link>
               </li>
               <li class="nav-item">
                 <Link href="/tickets" class="nav-link" :class="{ active: $page.url.startsWith('/tickets') }">
-                  <i class="nav-icon fas fa-box"></i>
+                  <i class="nav-icon fas fa-receipt"></i>
                   <p>Tickets</p>
                 </Link>
               </li>

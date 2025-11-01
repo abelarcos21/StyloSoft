@@ -10,10 +10,25 @@ use Inertia\Inertia;
 class ClienteController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $clientes = Cliente::orderBy('id', 'desc')->get();
-        return Inertia::render('Clientes/Index', compact('clientes'));
+        $query = Cliente::query();
+
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nombre', 'like', "%{$request->search}%")
+                ->orWhere('apellido', 'like', "%{$request->search}%")
+                ->orWhere('email', 'like', "%{$request->search}%")
+                ->orWhere('telefono', 'like', "%{$request->search}%");
+            });
+        }
+
+        $clientes = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
+
+        return Inertia::render('Clientes/Index', [
+            'clientes' => $clientes,
+            'filters' => $request->only('search'),
+        ]);
     }
 
     public function create()

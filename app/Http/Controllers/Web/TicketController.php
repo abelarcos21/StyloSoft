@@ -14,10 +14,27 @@ use Inertia\Inertia;
 
 class TicketController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tickets = Ticket::with(['cliente', 'empleado', 'detalleTickets'])->get();
-        return Inertia::render('Tickets/Index', compact('tickets'));
+        $query = Ticket::with(['cliente', 'empleado']);
+
+        if ($request->filled('search')) {
+            $query->whereHas('cliente', fn($q) => $q->where('nombre', 'like', "%{$request->search}%")
+                                                ->orWhere('apellido', 'like', "%{$request->search}%"))
+                ->orWhereHas('empleado', fn($q) => $q->where('nombre', 'like', "%{$request->search}%")
+                                                        ->orWhere('apellido', 'like', "%{$request->search}%"));
+        }
+
+        if ($request->filled('metodo_pago')) {
+            $query->where('metodo_pago', $request->metodo_pago);
+        }
+
+        $tickets = $query->orderBy('fecha', 'desc')->paginate(10)->withQueryString();
+
+        return inertia('Tickets/Index', [
+            'tickets' => $tickets,
+            'filters' => $request->only(['search', 'metodo_pago']),
+        ]);
     }
 
     public function create()

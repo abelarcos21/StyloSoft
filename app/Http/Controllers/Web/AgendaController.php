@@ -12,14 +12,26 @@ use Inertia\Inertia;
 
 class AgendaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $agendas = Agenda::with(['cliente', 'empleado', 'servicio'])
-            ->latest()
-            ->get();
+        $query = Agenda::with(['cliente', 'empleado', 'servicio']);
 
-        return Inertia::render('Agendas/Index', [
-            'agendas' => $agendas
+        if ($request->filled('search')) {
+            $query->whereHas('cliente', fn($q) => $q->where('nombre', 'like', "%{$request->search}%")
+                                                    ->orWhere('apellido', 'like', "%{$request->search}%"))
+                ->orWhereHas('empleado', fn($q) => $q->where('nombre', 'like', "%{$request->search}%")
+                                                        ->orWhere('apellido', 'like', "%{$request->search}%"));
+        }
+
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
+        }
+
+        $agendas = $query->orderBy('fecha_hora', 'desc')->paginate(10)->withQueryString();
+
+        return inertia('Agendas/Index', [
+            'agendas' => $agendas,
+            'filters' => $request->only(['search', 'estado']),
         ]);
     }
 

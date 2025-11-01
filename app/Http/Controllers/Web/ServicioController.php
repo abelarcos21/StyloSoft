@@ -9,10 +9,25 @@ use Inertia\Inertia;
 
 class ServicioController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $servicios = Servicio::orderBy('id', 'desc')->get();
-        return Inertia::render('Servicios/Index', compact('servicios'));
+        $query = Servicio::query();
+
+        if ($request->filled('search')) {
+            $query->where('nombre', 'like', "%{$request->search}%")
+                ->orWhere('descripcion', 'like', "%{$request->search}%");
+        }
+
+        if ($request->filled('estado')) {
+            $query->where('activo', $request->estado);
+        }
+
+        $servicios = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
+
+        return inertia('Servicios/Index', [
+            'servicios' => $servicios,
+            'filters' => $request->only(['search', 'estado']),
+        ]);
     }
 
     public function create()

@@ -10,12 +10,25 @@ use Inertia\Inertia;
 class ProductoController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $productos = Producto::orderBy('id', 'desc')->get();
+        
+        $query = Producto::query();
 
-        return Inertia::render('Productos/Index', [
-            'productos' => $productos
+        if ($request->filled('search')) {
+            $query->where('nombre', 'like', "%{$request->search}%")
+                ->orWhere('codigo', 'like', "%{$request->search}%");
+        }
+
+        if ($request->filled('estado')) {
+            $query->where('activo', $request->estado);
+        }
+
+        $productos = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
+
+        return inertia('Productos/Index', [
+            'productos' => $productos,
+            'filters' => $request->only(['search', 'estado']),
         ]);
     }
 
