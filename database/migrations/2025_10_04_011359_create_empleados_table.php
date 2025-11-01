@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('puesto'); // barber, estilista, masajista, etc.
             $table->decimal('salario', 10, 2)->nullable();
             $table->date('fecha_ingreso')->nullable();
+            $table->enum('estado', ['activo', 'inactivo'])->default('activo');
             $table->timestamps();
         });
     }

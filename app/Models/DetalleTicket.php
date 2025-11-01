@@ -10,16 +10,29 @@ class DetalleTicket extends Model
     use HasFactory;
 
     protected $fillable = [
-        'ticket_id', 'vendible_id', 'vendible_type', 'cantidad', 'precio_unitario', 'subtotal'
+        'ticket_id',
+        'vendible_type',
+        'vendible_id',
+        'cantidad',
+        'precio_unitario',
+        'subtotal',
     ];
 
+    // Relación polimórfica: puede ser Producto o Servicio
+    public function vendible()
+    {
+        return $this->morphTo();
+    }
+
+    // Relación con ticket
     public function ticket()
     {
         return $this->belongsTo(Ticket::class);
     }
 
-    public function vendible()
+    // Opción: calcular subtotal automáticamente
+    public function setSubtotalAttribute($value)
     {
-        return $this->morphTo(); // Esto apunta a Producto o Servicio
+        $this->attributes['subtotal'] = $this->cantidad * $this->precio_unitario;
     }
 }

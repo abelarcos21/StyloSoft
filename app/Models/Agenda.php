@@ -13,6 +13,10 @@ class Agenda extends Model
         'cliente_id', 'empleado_id', 'servicio_id', 'fecha_hora', 'estado'
     ];
 
+    protected $casts = [
+        'fecha_hora' => 'datetime',
+    ];
+
     public function cliente()
     {
         return $this->belongsTo(Cliente::class);

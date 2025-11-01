@@ -12,13 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('detalle_tickets', function (Blueprint $table) {
+
             $table->id();
+
+            // Relación con tickets
             $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
-            $table->morphs('vendible'); // puede ser producto o servicio - morphs te permite usar la misma tabla para guardar servicios y productos en los tickets.
+
+            // Polimórfica: producto o servicio
+            $table->morphs('vendible'); // genera vendible_id y vendible_type
+
             $table->integer('cantidad')->default(1);
-            $table->decimal('precio_unitario', 10, 2);
-            $table->decimal('subtotal', 10, 2);
+            $table->decimal('precio_unitario', 10, 2); // precio por unidad
+            $table->decimal('subtotal', 10, 2); // cantidad * precio_unitario
             $table->timestamps();
+
+            // Opcional: índice para acelerar consultas por ticket
+            $table->index('ticket_id');
         });
     }
 

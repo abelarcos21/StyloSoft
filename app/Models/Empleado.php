@@ -10,7 +10,7 @@ class Empleado extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nombre', 'apellido', 'email', 'telefono', 'direccion', 'puesto', 'salario', 'fecha_ingreso'
+        'nombre', 'apellido', 'email', 'telefono', 'direccion', 'puesto', 'salario', 'fecha_ingreso', 'estado'
     ];
 
     // Un empleado puede tener muchas agendas/citas
