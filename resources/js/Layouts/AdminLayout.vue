@@ -20,7 +20,7 @@
               <i class="fas fa-user-circle"></i> {{ user?.name || 'Usuario' }}
             </a>
             <div class="dropdown-menu dropdown-menu-right">
-              <Link :href="route('perfil')" class="dropdown-item">
+              <Link :href="route('profile.edit')" class="dropdown-item">
                 <i class="fas fa-user mr-2"></i> Perfil
               </Link>
               <div class="dropdown-divider"></div>

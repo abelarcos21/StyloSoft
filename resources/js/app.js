@@ -24,19 +24,22 @@ import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 
 const appName = import.meta.env.VITE_APP_NAME || 'StyloSoft';
+const appUrl = import.meta.env.VITE_APP_URL || '';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.vue`,
-            import.meta.glob('./Pages/**/*.vue')
-        ),
+    resolve: (name) => resolvePageComponent(
+        `./Pages/${name}.vue`,
+        import.meta.glob('./Pages/**/*.vue')
+    ),
     setup({ el, App, props, plugin }) {
-        const vueApp = createApp({ render: () => h(App, props) });
-        vueApp.use(plugin);
-        vueApp.use(ZiggyVue);
-        vueApp.mount(el);
+        return createApp({ render: () => h(App, props) })
+            .use(plugin)
+            .use(ZiggyVue, {
+                ...Ziggy,
+                url: appUrl, // Usar la URL base correcta
+            })
+            .mount(el);
     },
     progress: {
         color: '#4B5563',
