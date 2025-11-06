@@ -2,7 +2,7 @@
 /node_modules
 /public/hot
 /public/storage
-/public/build
+# /public/build  ← COMENTA esta línea para poder subir build a Git
 /storage/*.key
 /storage/pail
 /vendor
