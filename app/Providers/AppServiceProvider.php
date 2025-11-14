@@ -21,15 +21,9 @@ class AppServiceProvider extends ServiceProvider
             URL::forceRootUrl(config('app.url'));
         }
 
-        // Configurar Vite para subdirectorio
-        Vite::useScriptTagAttributes([
-            'defer' => true,
-        ]);
-
-        Vite::usePrefetchTagAttributes([
-            'as' => 'style',
-        ]);
-
-        Vite::prefetch(concurrency: 3);
+        // Solo configuraciones compatibles con tu versión de Laravel
+        if (method_exists(Vite::class, 'prefetch')) {
+            Vite::prefetch(concurrency: 3);
+        }
     }
 }
