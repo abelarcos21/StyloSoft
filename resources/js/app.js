@@ -24,7 +24,6 @@ import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 
 const appName = import.meta.env.VITE_APP_NAME || 'StyloSoft';
-const appUrl = import.meta.env.VITE_APP_URL || '';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -35,10 +34,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         return createApp({ render: () => h(App, props) })
             .use(plugin)
-            .use(ZiggyVue, {
-                ...Ziggy,
-                url: appUrl, // Usar la URL base correcta
-            })
+            .use(ZiggyVue)  // ← Simplificado, Ziggy se pasa automáticamente desde @routes
             .mount(el);
     },
     progress: {
