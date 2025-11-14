@@ -1,4 +1,4 @@
-/* import { defineConfig } from 'vite'; //ANTES LOCAL 
+/* import { defineConfig } from 'vite'; //ANTES LOCAL
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 
@@ -25,10 +25,10 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
-    base: '/StyloSoft/', // <- importante para subdirectorio
+    base: '/StyloSoft/',
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],  // opcional: si quieres compilar CSS separado 'resources/css/app.css',
+            input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
         }),
         vue({
@@ -40,13 +40,4 @@ export default defineConfig({
             },
         }),
     ],
-    build: {
-        manifest: true,
-        outDir: 'public/build',
-        rollupOptions: {
-            output: {
-                manualChunks: undefined,
-            },
-        },
-    },
 });
