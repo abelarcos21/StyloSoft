@@ -1,14 +1,13 @@
 <script setup>
-import { router } from '@inertiajs/vue3'
+import { router, Link } from '@inertiajs/vue3'  // ← Importa Link
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import { ref } from 'vue'
 
 const props = defineProps({
-  productos: Object, // con paginación
+  productos: Object,
   filters: Object
 })
 
-// Filtros reactivos
 const search = ref(props.filters.search || '')
 const estado = ref(props.filters.estado || '')
 
@@ -35,9 +34,10 @@ function eliminarProducto(id) {
         <h1 class="h4 mb-0 text-primary fw-bold">
           <i class="fas fa-boxes me-2"></i> Productos
         </h1>
-        <a href="/productos/create" class="btn btn-primary d-flex align-items-center gap-2 shadow-sm">
+        <!-- Cambio aquí: usa Link en lugar de <a> -->
+        <Link href="/productos/create" class="btn btn-primary d-flex align-items-center gap-2 shadow-sm">
           <i class="fas fa-plus"></i> Nuevo producto
-        </a>
+        </Link>
       </div>
 
       <!-- Filtros -->
@@ -108,13 +108,14 @@ function eliminarProducto(id) {
                 </td>
                 <td>
                   <div class="btn-group" role="group">
-                    <a
+                    <!-- Cambio aquí: usa Link en lugar de <a> -->
+                    <Link
                       :href="`/productos/${producto.id}/edit`"
                       class="btn btn-sm btn-outline-warning"
                       title="Editar"
                     >
                       <i class="fas fa-edit"></i>
-                    </a>
+                    </Link>
                     <button
                       @click.prevent="eliminarProducto(producto.id)"
                       class="btn btn-sm btn-outline-danger"
