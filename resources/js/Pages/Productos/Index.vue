@@ -35,7 +35,7 @@ function eliminarProducto(id) {
           <i class="fas fa-boxes me-2"></i> Productos
         </h1>
         <!-- Cambio aquí: usa Link en lugar de <a> -->
-        <Link href="/productos/create" class="btn btn-primary d-flex align-items-center gap-2 shadow-sm">
+        <Link :href="route('productos.create')" class="btn btn-primary d-flex align-items-center gap-2 shadow-sm">
           <i class="fas fa-plus"></i> Nuevo producto
         </Link>
       </div>
