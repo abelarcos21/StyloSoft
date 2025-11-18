@@ -14,13 +14,14 @@ class Servicio extends Model
         'nombre', 'descripcion', 'precio', 'duracion_minutos', 'activo'
     ];
 
-    public function agendas()
-    {
-        return $this->hasMany(Agenda::class);
+    public function agendas(){
+
+        return $this->belongsToMany(Agenda::class, 'agenda_servicio')
+                    ->withTimestamps();
     }
 
-    public function detalleTickets()
-    {
+    public function detalleTickets(){
+
         return $this->morphMany(DetalleTicket::class, 'vendible');
     }
 }

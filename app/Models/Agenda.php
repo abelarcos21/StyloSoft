@@ -10,12 +10,18 @@ class Agenda extends Model
     use HasFactory;
 
     protected $fillable = [
-        'cliente_id', 'empleado_id', 'servicio_id', 'fecha_hora', 'estado'
+        'cliente_id', 'empleado_id', 'servicio_id', 'tipo', 'fecha_hora', 'estado'
     ];
 
     protected $casts = [
         'fecha_hora' => 'datetime',
     ];
+
+    public function servicios(){
+
+        return $this->belongsToMany(Servicio::class, 'agenda_servicio')
+                    ->withTimestamps();
+    }
 
     public function cliente()
     {
@@ -27,8 +33,4 @@ class Agenda extends Model
         return $this->belongsTo(Empleado::class);
     }
 
-    public function servicio()
-    {
-        return $this->belongsTo(Servicio::class);
-    }
 }

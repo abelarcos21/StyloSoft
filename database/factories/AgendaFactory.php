@@ -22,7 +22,6 @@ class AgendaFactory extends Factory
         return [
             'cliente_id' => Cliente::factory(),
             'empleado_id' => Empleado::factory(),
-            'servicio_id' => Servicio::factory(),
             'fecha_hora' => $this->faker->dateTimeBetween('+1 days', '+1 month'),
             'estado' => $this->faker->randomElement(['pendiente', 'confirmada', 'cancelada', 'completada']),
         ];
