@@ -1,49 +1,279 @@
 <script setup>
+import { useForm } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
-import { router } from '@inertiajs/vue3'
-import { ref } from 'vue'
 
-const form = ref({
+const form = useForm({
   nombre: '',
   apellido: '',
   email: '',
   telefono: '',
-  direccion: ''
+  direccion: '',
+  fecha_nacimiento: '',
+  genero: '',
+  acepta_marketing: false,
+  notas: ''
 })
 
 function submit() {
-  router.post('/clientes', form.value)
+  form.post('/clientes', {
+    onSuccess: () => form.reset()
+  })
 }
 </script>
 
 <template>
-  <AdminLayout title="Crear Cliente">
-    <div class="card">
-      <div class="card-body">
-        <form @submit.prevent="submit">
-          <div class="mb-3">
-            <label>Nombre</label>
-            <input v-model="form.nombre" type="text" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label>Apellido</label>
-            <input v-model="form.apellido" type="text" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label>Email</label>
-            <input v-model="form.email" type="email" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label>Teléfono</label>
-            <input v-model="form.telefono" type="text" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label>Dirección</label>
-            <input v-model="form.direccion" type="text" class="form-control">
-          </div>
-          <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
+  <AdminLayout title="Nuevo Cliente">
+    <div class="container-fluid px-3">
+
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 text-primary fw-bold">
+          <i class="fas fa-user-plus me-2"></i> Nuevo Cliente
+        </h1>
+        <a href="/clientes" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-2"></i> Volver
+        </a>
       </div>
+
+      <!-- Formulario -->
+      <form @submit.prevent="submit">
+        <div class="row g-3">
+
+          <!-- Información Personal -->
+          <div class="col-12">
+            <div class="card shadow-sm border-0">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                  <i class="fas fa-user me-2"></i> Información Personal
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="row g-3">
+
+                  <!-- Nombre -->
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                      <i class="fas fa-signature text-primary me-2"></i> Nombre *
+                    </label>
+                    <input 
+                      type="text" 
+                      v-model="form.nombre" 
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.nombre }"
+                      placeholder="Ej: Juan"
+                      required
+                    >
+                    <div v-if="form.errors.nombre" class="invalid-feedback">
+                      {{ form.errors.nombre }}
+                    </div>
+                  </div>
+
+                  <!-- Apellido -->
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                      <i class="fas fa-signature text-primary me-2"></i> Apellido *
+                    </label>
+                    <input 
+                      type="text" 
+                      v-model="form.apellido" 
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.apellido }"
+                      placeholder="Ej: Pérez"
+                      required
+                    >
+                    <div v-if="form.errors.apellido" class="invalid-feedback">
+                      {{ form.errors.apellido }}
+                    </div>
+                  </div>
+
+                  <!-- Fecha Nacimiento -->
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">
+                      <i class="fas fa-birthday-cake text-info me-2"></i> Fecha de Nacimiento
+                    </label>
+                    <input 
+                      type="date" 
+                      v-model="form.fecha_nacimiento" 
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.fecha_nacimiento }"
+                      :max="new Date().toISOString().split('T')[0]"
+                    >
+                    <div v-if="form.errors.fecha_nacimiento" class="invalid-feedback">
+                      {{ form.errors.fecha_nacimiento }}
+                    </div>
+                  </div>
+
+                  <!-- Género -->
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">
+                      <i class="fas fa-venus-mars text-secondary me-2"></i> Género
+                    </label>
+                    <select 
+                      v-model="form.genero" 
+                      class="form-select"
+                      :class="{ 'is-invalid': form.errors.genero }"
+                    >
+                      <option value="">Seleccionar...</option>
+                      <option value="masculino">Masculino</option>
+                      <option value="femenino">Femenino</option>
+                      <option value="otro">Otro</option>
+                      <option value="prefiero_no_decir">Prefiero no decir</option>
+                    </select>
+                    <div v-if="form.errors.genero" class="invalid-feedback">
+                      {{ form.errors.genero }}
+                    </div>
+                  </div>
+
+                  <!-- Marketing -->
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold d-block">
+                      <i class="fas fa-bullhorn text-warning me-2"></i> Marketing
+                    </label>
+                    <div class="form-check form-switch mt-2">
+                      <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        v-model="form.acepta_marketing"
+                        id="acepta_marketing"
+                      >
+                      <label class="form-check-label" for="acepta_marketing">
+                        Acepta recibir promociones
+                      </label>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de Contacto -->
+          <div class="col-12">
+            <div class="card shadow-sm border-0">
+              <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                  <i class="fas fa-address-book me-2"></i> Información de Contacto
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="row g-3">
+
+                  <!-- Email -->
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                      <i class="fas fa-envelope text-primary me-2"></i> Email
+                    </label>
+                    <input 
+                      type="email" 
+                      v-model="form.email" 
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.email }"
+                      placeholder="ejemplo@correo.com"
+                    >
+                    <div v-if="form.errors.email" class="invalid-feedback">
+                      {{ form.errors.email }}
+                    </div>
+                  </div>
+
+                  <!-- Teléfono -->
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                      <i class="fas fa-phone text-success me-2"></i> Teléfono
+                    </label>
+                    <input 
+                      type="text" 
+                      v-model="form.telefono" 
+                      class="form-control"
+                      :class="{ 'is-invalid': form.errors.telefono }"
+                      placeholder="999-123-4567"
+                    >
+                    <div v-if="form.errors.telefono" class="invalid-feedback">
+                      {{ form.errors.telefono }}
+                    </div>
+                  </div>
+
+                  <!-- Dirección -->
+                  <div class="col-12">
+                    <label class="form-label fw-semibold">
+                      <i class="fas fa-map-marker-alt text-danger me-2"></i> Dirección
+                    </label>
+                    <textarea 
+                      v-model="form.direccion" 
+                      class="form-control" 
+                      rows="2"
+                      :class="{ 'is-invalid': form.errors.direccion }"
+                      placeholder="Calle, número, colonia, ciudad..."
+                    ></textarea>
+                    <div v-if="form.errors.direccion" class="invalid-feedback">
+                      {{ form.errors.direccion }}
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notas -->
+          <div class="col-12">
+            <div class="card shadow-sm border-0">
+              <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">
+                  <i class="fas fa-sticky-note me-2"></i> Notas Adicionales
+                </h5>
+              </div>
+              <div class="card-body">
+                <label class="form-label fw-semibold">
+                  Observaciones
+                </label>
+                <textarea 
+                  v-model="form.notas" 
+                  class="form-control" 
+                  rows="3"
+                  :class="{ 'is-invalid': form.errors.notas }"
+                  placeholder="Alergias, preferencias, observaciones especiales..."
+                ></textarea>
+                <div v-if="form.errors.notas" class="invalid-feedback">
+                  {{ form.errors.notas }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <a href="/clientes" class="btn btn-secondary">
+            <i class="fas fa-times me-2"></i> Cancelar
+          </a>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            :disabled="form.processing"
+          >
+            <i class="fas fa-save me-2"></i>
+            {{ form.processing ? 'Guardando...' : 'Guardar Cliente' }}
+          </button>
+        </div>
+
+      </form>
+
     </div>
   </AdminLayout>
 </template>
+
+<style scoped>
+.card {
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.form-check-input:checked {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+</style>

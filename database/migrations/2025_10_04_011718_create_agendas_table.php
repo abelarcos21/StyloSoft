@@ -15,10 +15,35 @@ return new class extends Migration
             $table->id();
             $table->foreignId('cliente_id')->constrained()->onDelete('cascade');
             $table->foreignId('empleado_id')->constrained()->onDelete('cascade');
-            $table->enum('tipo', ['flash', 'local'])->default('local');
-            $table->dateTime('fecha_hora');
-            $table->enum('estado', ['pendiente', 'confirmada', 'cancelada', 'completada'])->default('pendiente');
+
+            // Solo estas dos fechas son necesarias
+            $table->dateTime('fecha_hora_inicio')->index();
+            $table->dateTime('fecha_hora_fin');
+
+            // Enum más descriptivo
+            $table->enum('tipo', ['express', 'estandar'])->default('estandar')
+                ->comment('express: servicio rápido sin cita previa, estandar: cita programada');
+
+            $table->enum('estado', [
+                'pendiente',
+                'confirmada',
+                'en_proceso',
+                'completada',
+                'cancelada',
+                'no_asistio'
+            ])->default('pendiente');
+
+            // Campos adicionales útiles
+            $table->text('notas')->nullable()->comment('Notas especiales del cliente');
+            $table->string('cancelado_por')->nullable()->comment('cliente, empleado, sistema');
+            $table->text('razon_cancelacion')->nullable();
+
+            $table->softDeletes();
             $table->timestamps();
+
+            // Índices para mejorar performance
+            $table->index(['empleado_id', 'fecha_hora_inicio']);
+            $table->index(['cliente_id', 'estado']);
         });
     }
 

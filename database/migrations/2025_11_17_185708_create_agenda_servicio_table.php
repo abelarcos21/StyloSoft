@@ -15,7 +15,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('agenda_id')->constrained()->cascadeOnDelete();
             $table->foreignId('servicio_id')->constrained()->cascadeOnDelete();
+
+            // IMPORTANTE: Guardar precio/duración_minutos en el pivot para historico
+            $table->decimal('precio', 10, 2);
+            $table->integer('duracion_minutos');
+            $table->integer('orden')->default(0)->comment('Orden de ejecución');
+
             $table->timestamps();
+
+            $table->unique(['agenda_id', 'servicio_id', 'orden']);
         });
     }
 

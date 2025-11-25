@@ -1,140 +1,176 @@
-<template>
-  <AdminLayout>
-    <h2 class="mb-4">Editar Ticket #{{ ticket.id }}</h2>
-
-    <form @submit.prevent="submit">
-      <div class="mb-3">
-        <label>Cliente</label>
-        <select v-model="form.cliente_id" class="form-control">
-          <option value="">-- Seleccione cliente --</option>
-          <option v-for="c in clientes" :key="c.id" :value="c.id">{{ c.nombre }} {{ c.apellido }}</option>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label>Empleado</label>
-        <select v-model="form.empleado_id" class="form-control">
-          <option value="">-- Seleccione empleado --</option>
-          <option v-for="e in empleados" :key="e.id" :value="e.id">{{ e.nombre }} {{ e.apellido }}</option>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label>Método de pago</label>
-        <select v-model="form.metodo_pago" class="form-control">
-          <option value="">-- Seleccione --</option>
-          <option value="efectivo">Efectivo</option>
-          <option value="tarjeta">Tarjeta</option>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label>Fecha</label>
-        <input type="datetime-local" v-model="form.fecha" class="form-control" />
-      </div>
-
-      <hr />
-
-      <!-- Productos -->
-      <div class="mb-3">
-        <h4>Productos</h4>
-        <div v-for="(item, index) in form.productos" :key="index" class="row mb-2">
-          <div class="col-md-6">
-            <select v-model="item.id" class="form-control">
-              <option value="">-- Seleccione producto --</option>
-              <option v-for="p in productos" :key="p.id" :value="p.id">{{ p.nombre }}</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <input type="number" v-model.number="item.cantidad" class="form-control" min="1" placeholder="Cantidad" />
-          </div>
-          <div class="col-md-3">
-            <button type="button" class="btn btn-danger w-100" @click="removeProducto(index)">Eliminar</button>
-          </div>
-        </div>
-        <button type="button" class="btn btn-primary" @click="addProducto">Agregar Producto</button>
-      </div>
-
-      <!-- Servicios -->
-      <div class="mb-3">
-        <h4>Servicios</h4>
-        <div v-for="(item, index) in form.servicios" :key="index" class="row mb-2">
-          <div class="col-md-6">
-            <select v-model="item.id" class="form-control">
-              <option value="">-- Seleccione servicio --</option>
-              <option v-for="s in servicios" :key="s.id" :value="s.id">{{ s.nombre }}</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <input type="number" v-model.number="item.cantidad" class="form-control" min="1" placeholder="Cantidad" />
-          </div>
-          <div class="col-md-3">
-            <button type="button" class="btn btn-danger w-100" @click="removeServicio(index)">Eliminar</button>
-          </div>
-        </div>
-        <button type="button" class="btn btn-primary" @click="addServicio">Agregar Servicio</button>
-      </div>
-
-      <hr />
-      <div class="mb-3">
-        <h4>Total: ${{ total }}</h4>
-      </div>
-
-      <button type="submit" class="btn btn-success">Actualizar Ticket</button>
-      <Link href="/tickets" class="btn btn-secondary">Cancelar</Link>
-    </form>
-  </AdminLayout>
-</template>
-
 <script setup>
-import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { ref, computed } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3'
+import AdminLayout from '@/Layouts/AdminLayout.vue'
 
 const props = defineProps({
   ticket: Object,
   clientes: Array,
-  empleados: Array,
-  productos: Array,
-  servicios: Array,
-});
+  empleados: Array
+})
 
-// Inicialización segura del formulario
-const form = ref({
-  cliente_id: props.ticket.cliente_id || '',
-  empleado_id: props.ticket.empleado_id || '',
-  metodo_pago: props.ticket.metodo_pago || '',
-  fecha: props.ticket.fecha?.slice(0,16) || '',
-  productos: props.ticket.detalleTickets?.filter(d => d.vendible_type.includes('Producto')).map(d => ({
-    id: d.vendible_id, cantidad: d.cantidad
-  })) || [],
-  servicios: props.ticket.detalleTickets?.filter(d => d.vendible_type.includes('Servicio')).map(d => ({
-    id: d.vendible_id, cantidad: d.cantidad
-  })) || [],
-});
+const form = useForm({
+  metodo_pago: props.ticket.metodo_pago,
+  estado_pago: props.ticket.estado_pago,
+  descuento: props.ticket.descuento,
+  notas: props.ticket.notas
+})
 
-// Métodos para agregar/eliminar productos y servicios
-const addProducto = () => form.value.productos.push({id:'', cantidad:1});
-const removeProducto = (i) => form.value.productos.splice(i,1);
-const addServicio = () => form.value.servicios.push({id:'', cantidad:1});
-const removeServicio = (i) => form.value.servicios.splice(i,1);
-
-// Total seguro
-const total = computed(() => {
-  let sum = 0;
-  form.value.productos.forEach(p => {
-    const prod = props.productos.find(x => x.id === p.id);
-    if(prod) sum += Number(prod.precio_venta) * Number(p.cantidad);
-  });
-  form.value.servicios.forEach(s => {
-    const serv = props.servicios.find(x => x.id === s.id);
-    if(serv) sum += Number(serv.precio) * Number(s.cantidad);
-  });
-  return sum.toFixed(2);
-});
-
-// Submit
-const submit = () => {
-  router.put(`/tickets/${props.ticket.id}`, form.value);
-};
+function submit() {
+  form.put(`/tickets/${props.ticket.id}`)
+}
 </script>
+
+<template>
+  <AdminLayout title="Editar Ticket">
+    <div class="container-fluid px-3">
+
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h4 text-primary fw-bold">
+          <i class="fas fa-edit me-2"></i> Editar Ticket {{ ticket.numero_ticket }}
+        </h1>
+        <a href="/tickets" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-2"></i> Volver
+        </a>
+      </div>
+
+      <form @submit.prevent="submit">
+        <div class="row g-3">
+
+          <!-- Información del Ticket -->
+          <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+              <div class="card-header bg-primary text-white">
+                <h6 class="mb-0">
+                  <i class="fas fa-info-circle me-2"></i> Información del Ticket
+                </h6>
+              </div>
+              <div class="card-body">
+                <!-- Items -->
+                <div class="alert alert-info">
+                  <strong>Items vendidos:</strong>
+                  <ul class="mb-0 mt-2">
+                    <li v-for="item in ticket.items" :key="item.id">
+                      {{ item.nombre }} - {{ item.cantidad }} × ${{ item.precio_unitario }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edición -->
+          <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+              <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0">
+                  <i class="fas fa-edit me-2"></i> Editar Detalles
+                </h6>
+              </div>
+              <div class="card-body">
+                
+                <!-- Método de Pago -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-money-bill-wave text-success me-2"></i> Método de Pago
+                  </label>
+                  <select 
+                    v-model="form.metodo_pago" 
+                    class="form-select"
+                    :class="{ 'is-invalid': form.errors.metodo_pago }"
+                  >
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="mixto">Mixto</option>
+                  </select>
+                  <div v-if="form.errors.metodo_pago" class="invalid-feedback">
+                    {{ form.errors.metodo_pago }}
+                  </div>
+                </div>
+
+                <!-- Estado de Pago -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-flag text-danger me-2"></i> Estado de Pago
+                  </label>
+                  <select 
+                    v-model="form.estado_pago" 
+                    class="form-select"
+                    :class="{ 'is-invalid': form.errors.estado_pago }"
+                  >
+                    <option value="pagado">Pagado</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="parcial">Parcial</option>
+                  </select>
+                  <div v-if="form.errors.estado_pago" class="invalid-feedback">
+                    {{ form.errors.estado_pago }}
+                  </div>
+                </div>
+
+                <!-- Descuento -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-percentage text-info me-2"></i> Descuento
+                  </label>
+                  <input 
+                    type="number" 
+                    v-model="form.descuento" 
+                    class="form-control"
+                    :class="{ 'is-invalid': form.errors.descuento }"
+                    step="0.01"
+                    min="0"
+                  >
+                  <div v-if="form.errors.descuento" class="invalid-feedback">
+                    {{ form.errors.descuento }}
+                  </div>
+                </div>
+
+                <!-- Notas -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">
+                    <i class="fas fa-sticky-note text-secondary me-2"></i> Notas
+                  </label>
+                  <textarea 
+                    v-model="form.notas" 
+                    class="form-control" 
+                    rows="3"
+                    :class="{ 'is-invalid': form.errors.notas }"
+                  ></textarea>
+                  <div v-if="form.errors.notas" class="invalid-feedback">
+                    {{ form.errors.notas }}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <a href="/tickets" class="btn btn-secondary">
+            <i class="fas fa-times me-2"></i> Cancelar
+          </a>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            :disabled="form.processing"
+          >
+            <i class="fas fa-save me-2"></i>
+            {{ form.processing ? 'Guardando...' : 'Actualizar Ticket' }}
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </AdminLayout>
+</template>
+
+<style scoped>
+.card {
+  transition: transform 0.2s;
+}
+</style>
