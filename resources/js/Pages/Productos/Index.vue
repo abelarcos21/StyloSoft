@@ -73,7 +73,7 @@ function getStockClass(producto) {
 
       <!-- Header -->
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4">
-        <h1 class="h4 text-primary fw-bold">
+        <h1 class="h4 text-pink fw-bold">
           <i class="fas fa-boxes me-2"></i> Gestionar Productos
         </h1>
         <div class="btn-group">

@@ -10,6 +10,8 @@ use App\Http\Controllers\Web\ServicioController;
 use App\Http\Controllers\Web\ProductoController;
 use App\Http\Controllers\Web\TicketController;
 use App\Http\Controllers\Web\AgendaController;
+use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\ReporteController;
 
 // Ruta principal - redirige al login o dashboard
 Route::get('/', function () {
@@ -19,9 +21,20 @@ Route::get('/', function () {
 })->name('home');
 
 // Dashboard
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth','verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // ... resto de tus rutas
+});
+
+Route::middleware(['auth','verified'])->group(function () {
+    Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+    Route::post('/reportes/ventas', [ReporteController::class, 'ventas'])->name('reportes.ventas');
+    Route::post('/reportes/servicios', [ReporteController::class, 'servicios'])->name('reportes.servicios');
+    Route::post('/reportes/productos', [ReporteController::class, 'productos'])->name('reportes.productos');
+    Route::post('/reportes/empleados', [ReporteController::class, 'empleados'])->name('reportes.empleados');
+    
+});
 
 // Perfil
 Route::middleware('auth')->group(function () {

@@ -6,6 +6,16 @@ const props = defineProps({
   ticket: Object
 })
 
+// Función para imprimir
+const handlePrint = () => {
+  window.print()
+}
+
+// Función para cerrar
+const handleClose = () => {
+  window.close()
+}
+
 onMounted(() => {
   // Auto-imprimir cuando carga la página
   setTimeout(() => {
@@ -19,7 +29,7 @@ onMounted(() => {
 
   <div class="ticket-container">
     <div class="ticket">
-      
+
       <!-- Header / Logo -->
       <div class="header">
         <h1 class="business-name">TU NEGOCIO</h1>
@@ -85,19 +95,19 @@ onMounted(() => {
           <span>Subtotal:</span>
           <span>${{ ticket.subtotal }}</span>
         </div>
-        
+
         <div class="total-row" v-if="parseFloat(ticket.descuento) > 0">
           <span>Descuento:</span>
           <span class="text-danger">-${{ ticket.descuento }}</span>
         </div>
-        
+
         <div class="total-row">
           <span>IVA (16%):</span>
           <span>${{ ticket.impuesto }}</span>
         </div>
-        
+
         <div class="separator-line"></div>
-        
+
         <div class="total-row total-final">
           <span>TOTAL:</span>
           <span>${{ ticket.total }}</span>
@@ -107,7 +117,7 @@ onMounted(() => {
       <!-- Método de Pago -->
       <div class="payment-section">
         <p>
-          <strong>Método de pago:</strong> 
+          <strong>Método de pago:</strong>
           <span class="text-uppercase">{{ ticket.metodo_pago }}</span>
         </p>
       </div>
@@ -128,10 +138,10 @@ onMounted(() => {
 
     <!-- Botones de control (solo en pantalla) -->
     <div class="no-print controls">
-      <button @click="window.print()" class="btn btn-primary">
+      <button @click="handlePrint" class="btn btn-primary">
         <i class="fas fa-print"></i> Imprimir
       </button>
-      <button @click="window.close()" class="btn btn-secondary">
+      <button @click="handleClose" class="btn btn-secondary">
         <i class="fas fa-times"></i> Cerrar
       </button>
     </div>
@@ -430,9 +440,9 @@ body {
 }
 
 /* Para impresoras de 58mm */
-@media print and (max-width: 80mm) {
+@media print and (max-width: 58mm) {
   .ticket-container {
-    max-width: 80mm;
+    max-width: 58mm;
   }
 
   .business-name {

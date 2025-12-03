@@ -63,7 +63,7 @@ function exportarClientes() {
 
       <!-- Header -->
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4">
-        <h1 class="h4 text-primary fw-bold">
+        <h1 class="h4 text-pink fw-bold">
           <i class="fas fa-users me-2"></i> Gestionar Clientes
         </h1>
         <div class="btn-group">

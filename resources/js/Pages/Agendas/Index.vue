@@ -73,7 +73,7 @@ function confirmarAgenda(id) {
 
       <!-- Header -->
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4">
-        <h1 class="h4 text-primary fw-bold">
+        <h1 class="h4 text-pink fw-bold">
           <i class="fas fa-calendar-alt me-2"></i> Gestionar Agendas
         </h1>
         <a href="/agendas/create" class="btn btn-primary">
@@ -117,6 +117,12 @@ function confirmarAgenda(id) {
               <option value="express">Express</option>
               <option value="estandar">Estándar</option>
             </select>
+          </div>
+
+          <div class="col-md-2">
+            <button @click="search = ''; estado = ''; tipo = ''; filtrar()" class="btn btn-secondary w-100">
+              <i class="fas fa-redo me-2"></i> Limpiar
+            </button>
           </div>
 
         </div>
@@ -289,6 +295,7 @@ function confirmarAgenda(id) {
 </template>
 
 <style scoped>
+
 .badge {
   font-size: 0.75rem;
   font-weight: 600;
@@ -306,4 +313,5 @@ function confirmarAgenda(id) {
 .table tbody tr:hover {
   background-color: rgba(0, 123, 255, 0.05);
 }
+
 </style>
