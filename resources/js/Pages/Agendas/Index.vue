@@ -1,8 +1,9 @@
 <script setup>
-import { router } from '@inertiajs/vue3'
+import { ref, watch } from 'vue'
+import { router, Link } from '@inertiajs/vue3' // Importado Link
 import AdminLayout from '@/Layouts/AdminLayout.vue'
-import { ref } from 'vue'
 import Swal from 'sweetalert2'
+import debounce from 'lodash.debounce'
 
 const props = defineProps({
   agendas: Object,
@@ -13,7 +14,8 @@ const search = ref(props.filters.search || '')
 const estado = ref(props.filters.estado || '')
 const tipo = ref(props.filters.tipo || '')
 
-function filtrar() {
+// Filtrado con debounce para la búsqueda (evita saturar el servidor al teclear rápido)
+const filtrar = debounce(() => {
   router.get('/agendas', {
     search: search.value,
     estado: estado.value,
@@ -22,10 +24,24 @@ function filtrar() {
     preserveState: true,
     replace: true,
   })
-}
+}, 300)
+
+// Observar cambios en búsqueda para disparar el filtro de forma automática y óptima
+watch(search, () => filtrar())
+
+// SweetAlert estilizado
+const swalEstilizado = Swal.mixin({
+  confirmButtonColor: '#d84b72',
+  cancelButtonColor: '#6c757d',
+  customClass: {
+    confirmButton: 'btn btn-primary text-white rounded-pill px-4',
+    cancelButton: 'btn btn-secondary rounded-pill px-4 ms-2'
+  },
+  buttonsStyling: false
+})
 
 function cancelarAgenda(id) {
-  Swal.fire({
+  swalEstilizado.fire({
     title: "¿Cancelar agenda?",
     text: "Esta acción cambiará su estado a 'cancelada'.",
     icon: "warning",
@@ -41,7 +57,7 @@ function cancelarAgenda(id) {
         cancelado_por: 'sistema'
       }, {
         onSuccess: () => {
-          Swal.fire("Cancelada", "La agenda ha sido cancelada.", "success")
+          swalEstilizado.fire("Cancelada", "La agenda ha sido cancelada.", "success")
         }
       })
     }
@@ -49,7 +65,7 @@ function cancelarAgenda(id) {
 }
 
 function confirmarAgenda(id) {
-  Swal.fire({
+  swalEstilizado.fire({
     title: "¿Confirmar cita?",
     icon: "question",
     showCancelButton: true,
@@ -59,7 +75,7 @@ function confirmarAgenda(id) {
     if (result.isConfirmed) {
       router.put(`/agendas/${id}/confirmar`, {}, {
         onSuccess: () => {
-          Swal.fire("Confirmada", "La cita ha sido confirmada.", "success")
+          swalEstilizado.fire("Confirmada", "La cita ha sido confirmada.", "success")
         }
       })
     }
@@ -69,38 +85,33 @@ function confirmarAgenda(id) {
 
 <template>
   <AdminLayout title="Agendas">
-    <div class="container-fluid px-3">
-
-      <!-- Header -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4">
-        <h1 class="h4 text-pink fw-bold">
+    <div class="container-fluid px-0 px-md-3">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <h1 class="h4 brand-accent fw-bold mb-0">
           <i class="fas fa-calendar-alt me-2"></i> Gestionar Agendas
         </h1>
-        <a href="/agendas/create" class="btn btn-primary">
+        <Link href="/agendas/create" class="btn btn-brand rounded-pill px-4 shadow-sm">
           <i class="fas fa-plus me-2"></i> Nueva Agenda
-        </a>
+        </Link>
       </div>
 
-      <!-- Filtros -->
-      <div class="card shadow-sm border-0 mb-3">
-        <div class="card-body row g-2">
-
-          <div class="col-md-4">
+      <div class="card shadow-sm border-0 mb-4 rounded-4">
+        <div class="card-body row g-3">
+          <div class="col-12 col-md-4">
             <div class="input-group">
-              <span class="input-group-text bg-light">
-                <i class="fas fa-search"></i>
+              <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                <i class="fas fa-search text-muted"></i>
               </span>
               <input
-                class="form-control"
+                class="form-control border-start-0 bg-light rounded-end-pill focus-ring-none"
                 v-model="search"
-                @input="filtrar"
                 placeholder="Buscar cliente o empleado…"
               >
             </div>
           </div>
 
-          <div class="col-md-3">
-            <select v-model="estado" @change="filtrar" class="form-select">
+          <div class="col-6 col-md-3">
+            <select v-model="estado" @change="filtrar" class="form-select bg-light rounded-pill border-0">
               <option value="">Todos los estados</option>
               <option value="pendiente">Pendiente</option>
               <option value="confirmada">Confirmada</option>
@@ -111,168 +122,151 @@ function confirmarAgenda(id) {
             </select>
           </div>
 
-          <div class="col-md-3">
-            <select v-model="tipo" @change="filtrar" class="form-select">
+          <div class="col-6 col-md-3">
+            <select v-model="tipo" @change="filtrar" class="form-select bg-light rounded-pill border-0">
               <option value="">Todos los tipos</option>
               <option value="express">Express</option>
               <option value="estandar">Estándar</option>
             </select>
           </div>
 
-          <div class="col-md-2">
-            <button @click="search = ''; estado = ''; tipo = ''; filtrar()" class="btn btn-secondary w-100">
-              <i class="fas fa-redo me-2"></i> Limpiar
+          <div class="col-12 col-md-2">
+            <button @click="search = ''; estado = ''; tipo = ''; filtrar()" class="btn btn-light rounded-pill w-100 text-muted">
+              <i class="fas fa-redo me-1"></i> Limpiar
             </button>
           </div>
-
         </div>
       </div>
 
-      <!-- Tabla -->
-      <div class="card shadow-sm border-0">
+      <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
+          <table class="table table-hover align-middle mb-0 custom-table">
+            <thead class="bg-light text-muted">
               <tr>
-                <th class="text-center">#</th>
-                <th>Cliente</th>
-                <th>Empleado</th>
-                <th>Servicios</th>
-                <th class="text-center">Total</th>
-                <th class="text-center">Fecha y Hora</th>
-                <th class="text-center">Tipo</th>
-                <th class="text-center">Estado</th>
-                <th class="text-center">Acciones</th>
+                <th class="text-center border-0 font-weight-semibold">#</th>
+                <th class="border-0 font-weight-semibold">Cliente</th>
+                <th class="border-0 font-weight-semibold">Empleado</th>
+                <th class="border-0 font-weight-semibold">Servicios</th>
+                <th class="text-center border-0 font-weight-semibold">Total</th>
+                <th class="text-center border-0 font-weight-semibold">Fecha y Hora</th>
+                <th class="text-center border-0 font-weight-semibold">Tipo</th>
+                <th class="text-center border-0 font-weight-semibold">Estado</th>
+                <th class="text-center border-0 font-weight-semibold">Acciones</th>
               </tr>
             </thead>
 
             <tbody>
               <tr v-for="agenda in agendas.data" :key="agenda.id">
-                <td class="text-center">{{ agenda.id }}</td>
+                <td class="text-center text-muted">{{ agenda.id }}</td>
 
-                <!-- CLIENTE -->
                 <td>
-                  <strong>{{ agenda.cliente.nombre_completo }}</strong><br>
-                  <small class="text-muted">
+                  <div class="fw-bold text-dark">{{ agenda.cliente.nombre_completo }}</div>
+                  <div class="small text-muted">
                     <i class="fas fa-phone fa-xs me-1"></i>{{ agenda.cliente.telefono }}
-                  </small>
+                  </div>
                 </td>
 
-                <!-- EMPLEADO -->
                 <td>
-                  <strong>{{ agenda.empleado.nombre_completo }}</strong><br>
-                  <small class="text-muted">{{ agenda.empleado.puesto }}</small>
+                  <div class="fw-bold text-dark">{{ agenda.empleado.nombre_completo }}</div>
+                  <div class="small text-muted">{{ agenda.empleado.puesto }}</div>
                 </td>
 
-                <!-- SERVICIOS -->
                 <td>
                   <span
                     v-for="srv in agenda.servicios"
                     :key="srv.id"
-                    class="badge bg-secondary me-1 mb-1"
+                    class="badge bg-light text-secondary border me-1 mb-1 fw-normal"
                   >
                     {{ srv.nombre }}
                   </span>
-                  <br>
-                  <small class="text-muted">
+                  <div class="small text-muted mt-1">
                     <i class="fas fa-clock fa-xs me-1"></i>{{ agenda.duracion_total }} min
-                  </small>
-                </td>
-
-                <!-- TOTAL -->
-                <td class="text-center fw-bold text-success">
-                  ${{ agenda.total }}
-                </td>
-
-                <!-- FECHA -->
-                <td class="text-center">
-                  <div class="d-flex flex-column">
-                    <span class="fw-semibold">{{ agenda.fecha_formato }}</span>
                   </div>
                 </td>
 
-                <!-- TIPO -->
+                <td class="text-center fw-bold brand-accent">
+                  ${{ agenda.total }}
+                </td>
+
                 <td class="text-center">
-                  <span :class="agenda.tipo === 'express' ? 'badge bg-warning text-dark' : 'badge bg-info'">
-                    {{ agenda.tipo.toUpperCase() }}
+                  <span class="fw-medium text-dark">{{ agenda.fecha_formato }}</span>
+                </td>
+
+                <td class="text-center">
+                  <span class="badge rounded-pill fw-medium px-3" :class="agenda.tipo === 'express' ? 'bg-warning-subtle text-warning' : 'bg-info-subtle text-info'">
+                    {{ agenda.tipo }}
                   </span>
                 </td>
 
-                <!-- ESTADO -->
                 <td class="text-center">
                   <span
-                    class="badge px-3 py-2"
+                    class="badge rounded-pill px-3 py-2 fw-medium"
                     :class="{
-                      'bg-warning text-dark': agenda.estado === 'pendiente',
-                      'bg-info': agenda.estado === 'confirmada',
-                      'bg-primary': agenda.estado === 'en_proceso',
-                      'bg-success': agenda.estado === 'completada',
-                      'bg-danger': agenda.estado === 'cancelada',
-                      'bg-dark': agenda.estado === 'no_asistio'
+                      'bg-warning-subtle text-warning': agenda.estado === 'pendiente',
+                      'bg-info-subtle text-info': agenda.estado === 'confirmada',
+                      'bg-primary-subtle text-primary': agenda.estado === 'en_proceso',
+                      'bg-success-subtle text-success': agenda.estado === 'completada',
+                      'bg-danger-subtle text-danger': agenda.estado === 'cancelada',
+                      'bg-secondary-subtle text-secondary': agenda.estado === 'no_asistio'
                     }"
                   >
-                    {{ agenda.estado.replace('_', ' ').toUpperCase() }}
+                    {{ agenda.estado.replace('_', ' ') }}
                   </span>
                 </td>
 
-                <!-- ACCIONES -->
                 <td class="text-center">
-                  <div class="btn-group">
-                    <!-- Ver -->
-                    <a
+                  <div class="d-flex justify-content-center gap-2">
+                    <Link
                       :href="`/agendas/${agenda.id}`"
-                      class="btn btn-sm btn-outline-info"
+                      class="btn btn-sm btn-light text-info rounded-circle action-btn"
                       title="Ver detalles"
                     >
                       <i class="fas fa-eye"></i>
-                    </a>
+                    </Link>
 
-                    <!-- Editar -->
-                    <a
+                    <Link
                       :href="`/agendas/${agenda.id}/edit`"
-                      class="btn btn-sm btn-outline-warning"
+                      class="btn btn-sm btn-light text-warning rounded-circle action-btn"
                       title="Editar"
                     >
                       <i class="fas fa-edit"></i>
-                    </a>
+                    </Link>
 
-                    <!-- Confirmar (solo pendientes) -->
                     <button
                       v-if="agenda.estado === 'pendiente'"
                       @click.prevent="confirmarAgenda(agenda.id)"
-                      class="btn btn-sm btn-outline-success"
+                      class="btn btn-sm btn-light text-success rounded-circle action-btn"
                       title="Confirmar cita"
                     >
                       <i class="fas fa-check"></i>
                     </button>
 
-                    <!-- Cancelar (solo pendientes o confirmadas) -->
                     <button
                       v-if="['pendiente', 'confirmada'].includes(agenda.estado)"
                       @click.prevent="cancelarAgenda(agenda.id)"
-                      class="btn btn-sm btn-outline-danger"
+                      class="btn btn-sm btn-light text-danger rounded-circle action-btn"
                       title="Cancelar"
                     >
                       <i class="fas fa-ban"></i>
                     </button>
                   </div>
                 </td>
-
               </tr>
 
               <tr v-if="!agendas.data.length">
-                <td colspan="9" class="text-center text-muted py-5">
-                  <i class="fas fa-calendar-times fa-3x mb-3 d-block"></i>
-                  <p class="mb-0">No hay agendas registradas con los filtros seleccionados.</p>
+                <td colspan="9" class="text-center py-5">
+                  <div class="text-muted d-flex flex-column align-items-center">
+                    <i class="fas fa-calendar-times fa-3x mb-3 text-light"></i>
+                    <h5 class="fw-medium text-secondary">Sin resultados</h5>
+                    <p class="mb-0 small">No hay agendas registradas con los filtros seleccionados.</p>
+                  </div>
                 </td>
               </tr>
-
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Paginación -->
       <nav class="mt-4" v-if="agendas.data.length">
         <ul class="pagination justify-content-center flex-wrap">
           <li
@@ -282,7 +276,7 @@ function confirmarAgenda(id) {
             :class="{ active: link.active, disabled: !link.url }"
           >
             <button
-              class="page-link"
+              class="page-link shadow-sm border-0 mx-1 rounded-2"
               v-html="link.label"
               @click="link.url && router.get(link.url, {}, { preserveState: true })"
             />
@@ -295,23 +289,80 @@ function confirmarAgenda(id) {
 </template>
 
 <style scoped>
+/* Variables y colores principales */
+.brand-accent {
+  color: #d84b72;
+}
 
-.badge {
+.btn-brand {
+  background-color: #d84b72;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-brand:hover {
+  background-color: #c03d61;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Modificadores de inputs */
+.focus-ring-none:focus {
+  box-shadow: none;
+  border-color: #dee2e6;
+}
+
+/* Tabla personalizada */
+.custom-table th {
+  text-transform: uppercase;
   font-size: 0.75rem;
-  font-weight: 600;
   letter-spacing: 0.5px;
 }
 
-.btn-group .btn {
-  padding: 0.25rem 0.5rem;
+.custom-table tbody tr {
+  transition: background-color 0.2s ease;
 }
 
-.table tbody tr {
-  transition: background-color 0.2s;
+.custom-table tbody tr:hover {
+  background-color: #f8f9fa;
 }
 
-.table tbody tr:hover {
-  background-color: rgba(0, 123, 255, 0.05);
+/* Botones de acción */
+.action-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background-color: #f8f9fa;
 }
 
+.action-btn:hover {
+  transform: scale(1.1);
+  background-color: #e9ecef;
+}
+
+/* Clases sutiles para Bootstrap (Por si no usas Bootstrap 5.3 que ya las trae) */
+.bg-warning-subtle { background-color: #fff3cd !important; }
+.bg-info-subtle { background-color: #cff4fc !important; }
+.bg-primary-subtle { background-color: #cfe2ff !important; }
+.bg-success-subtle { background-color: #d1e7dd !important; }
+.bg-danger-subtle { background-color: #f8d7da !important; }
+.bg-secondary-subtle { background-color: #e2e3e5 !important; }
+
+/* Paginación corporativa */
+.page-link {
+  color: #6c757d;
+}
+
+.page-link:hover {
+  color: #d84b72;
+  background-color: #f8f9fa;
+}
+
+.page-item.active .page-link {
+  background-color: #d84b72;
+  color: white;
+}
 </style>
