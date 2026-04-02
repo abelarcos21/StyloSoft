@@ -44,7 +44,7 @@ const total = computed(() => {
 // Funciones
 function agregarItem(item) {
   const existe = itemsVenta.value.find(i => i.id === item.id && i.tipo === item.tipo)
-  
+
   if (existe) {
     if (item.tipo === 'producto' && existe.cantidad >= item.stock) {
       alert('Stock insuficiente')
@@ -61,7 +61,7 @@ function agregarItem(item) {
       stock: item.stock || null
     })
   }
-  
+
   busquedaItem.value = ''
 }
 
@@ -139,7 +139,7 @@ onMounted(() => {
 
           <!-- Panel Izquierdo - Selección de Items -->
           <div class="col-lg-7">
-            
+
             <!-- Cliente y Empleado -->
             <div class="card shadow-sm border-0 mb-3">
               <div class="card-header bg-primary text-white">
@@ -155,8 +155,8 @@ onMounted(() => {
                   </div>
                   <div class="col-md-6">
                     <label class="form-label fw-semibold">Empleado que Atiende *</label>
-                    <select 
-                      id="empleado-select" 
+                    <select
+                      id="empleado-select"
                       class="form-select"
                       :class="{ 'is-invalid': form.errors.empleado_id }"
                     ></select>
@@ -176,16 +176,16 @@ onMounted(() => {
                 </h6>
               </div>
               <div class="card-body">
-                <input 
-                  type="text" 
-                  v-model="busquedaItem" 
+                <input
+                  type="text"
+                  v-model="busquedaItem"
                   class="form-control form-control-lg mb-3"
                   placeholder="Buscar por nombre..."
                 >
 
                 <div class="items-grid">
                   <!-- Servicios -->
-                  <div 
+                  <div
                     v-for="servicio in servicios.filter(s => !busquedaItem || s.text.toLowerCase().includes(busquedaItem.toLowerCase()))"
                     :key="'s-' + servicio.id"
                     @click="agregarItem(servicio)"
@@ -197,7 +197,7 @@ onMounted(() => {
                   </div>
 
                   <!-- Productos -->
-                  <div 
+                  <div
                     v-for="producto in productos.filter(p => !busquedaItem || p.text.toLowerCase().includes(busquedaItem.toLowerCase()))"
                     :key="'p-' + producto.id"
                     @click="agregarItem(producto)"
@@ -216,7 +216,7 @@ onMounted(() => {
 
           <!-- Panel Derecho - Carrito -->
           <div class="col-lg-5">
-            
+
             <!-- Items del Carrito -->
             <div class="card shadow-sm border-0 mb-3">
               <div class="card-header bg-dark text-white">
@@ -231,8 +231,8 @@ onMounted(() => {
                 </div>
 
                 <div v-else>
-                  <div 
-                    v-for="(item, index) in itemsVenta" 
+                  <div
+                    v-for="(item, index) in itemsVenta"
                     :key="index"
                     class="item-carrito"
                   >
@@ -244,9 +244,9 @@ onMounted(() => {
                           {{ item.tipo }}
                         </div>
                       </div>
-                      <button 
+                      <button
                         type="button"
-                        @click="eliminarItem(index)" 
+                        @click="eliminarItem(index)"
                         class="btn btn-sm btn-danger"
                       >
                         <i class="fas fa-trash"></i>
@@ -255,9 +255,9 @@ onMounted(() => {
 
                     <div class="d-flex justify-content-between align-items-center mt-2">
                       <div class="btn-group">
-                        <button 
+                        <button
                           type="button"
-                          @click="cambiarCantidad(item, 'decrementar')" 
+                          @click="cambiarCantidad(item, 'decrementar')"
                           class="btn btn-sm btn-outline-secondary"
                         >
                           <i class="fas fa-minus"></i>
@@ -265,9 +265,9 @@ onMounted(() => {
                         <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
                           {{ item.cantidad }}
                         </button>
-                        <button 
+                        <button
                           type="button"
-                          @click="cambiarCantidad(item, 'incrementar')" 
+                          @click="cambiarCantidad(item, 'incrementar')"
                           class="btn btn-sm btn-outline-secondary"
                         >
                           <i class="fas fa-plus"></i>
@@ -301,9 +301,9 @@ onMounted(() => {
 
                 <div class="mb-2">
                   <label class="form-label mb-1">Descuento:</label>
-                  <input 
-                    type="number" 
-                    v-model="form.descuento" 
+                  <input
+                    type="number"
+                    v-model="form.descuento"
                     class="form-control form-control-sm"
                     placeholder="0.00"
                     step="0.01"
@@ -333,8 +333,8 @@ onMounted(() => {
                 </h6>
               </div>
               <div class="card-body">
-                <select 
-                  v-model="form.metodo_pago" 
+                <select
+                  v-model="form.metodo_pago"
                   class="form-select"
                   :class="{ 'is-invalid': form.errors.metodo_pago }"
                 >
@@ -350,9 +350,9 @@ onMounted(() => {
                 <!-- Notas -->
                 <div class="mt-3">
                   <label class="form-label">Notas (opcional)</label>
-                  <textarea 
-                    v-model="form.notas" 
-                    class="form-control" 
+                  <textarea
+                    v-model="form.notas"
+                    class="form-control"
                     rows="2"
                     placeholder="Observaciones adicionales..."
                   ></textarea>
@@ -361,8 +361,8 @@ onMounted(() => {
             </div>
 
             <!-- Botón de Cobrar -->
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               class="btn btn-success btn-lg w-100"
               :disabled="form.processing || itemsVenta.length === 0"
             >

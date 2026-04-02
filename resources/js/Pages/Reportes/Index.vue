@@ -2,6 +2,7 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import Swal from 'sweetalert2'
 
 defineProps({
   empleados: Array
@@ -25,6 +26,17 @@ const reporteServicios = ref(null)
 const reporteProductos = ref(null)
 const reporteEmpleados = ref(null)
 
+// Utilidad para errores
+const mostrarError = () => {
+  Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: 'Hubo un problema al generar el reporte. Por favor, intenta de nuevo.',
+    confirmButtonColor: '#d84b72',
+    customClass: { confirmButton: 'btn btn-brand rounded-pill px-4' }
+  })
+}
+
 // Funciones
 async function generarReporteVentas() {
   cargando.value = true
@@ -38,7 +50,7 @@ async function generarReporteVentas() {
     reporteVentas.value = data
   } catch (error) {
     console.error(error)
-    alert('Error al generar el reporte')
+    mostrarError()
   } finally {
     cargando.value = false
   }
@@ -54,7 +66,7 @@ async function generarReporteServicios() {
     reporteServicios.value = data
   } catch (error) {
     console.error(error)
-    alert('Error al generar el reporte')
+    mostrarError()
   } finally {
     cargando.value = false
   }
@@ -70,7 +82,7 @@ async function generarReporteProductos() {
     reporteProductos.value = data
   } catch (error) {
     console.error(error)
-    alert('Error al generar el reporte')
+    mostrarError()
   } finally {
     cargando.value = false
   }
@@ -86,7 +98,7 @@ async function generarReporteEmpleados() {
     reporteEmpleados.value = data
   } catch (error) {
     console.error(error)
-    alert('Error al generar el reporte')
+    mostrarError()
   } finally {
     cargando.value = false
   }
@@ -107,23 +119,21 @@ function cambiarTab(tab) {
 
 <template>
   <AdminLayout title="Reportes">
-    <div class="container-fluid px-3">
+    <div class="container-fluid px-0 px-md-3">
 
-      <!-- Header -->
       <div class="row mb-4">
         <div class="col-12">
-          <h2 class="h4 text-pink fw-bold mb-1">
-            <i class="fas fa-chart-line me-2"></i>Reportes y Estadísticas
+          <h2 class="h4 brand-accent fw-bold mb-1">
+            <i class="fas fa-chart-pie me-2"></i>Reportes y Estadísticas
           </h2>
-          <p class="text-muted mb-0">Analiza el rendimiento de tu negocio</p>
+          <p class="text-muted mb-0 small">Analiza el rendimiento general de tu negocio</p>
         </div>
       </div>
 
-      <!-- Tabs -->
-      <ul class="nav nav-tabs mb-4">
+      <ul class="nav nav-tabs custom-tabs mb-4 border-0">
         <li class="nav-item">
-          <button 
-            class="nav-link" 
+          <button
+            class="nav-link"
             :class="{ active: tabActiva === 'ventas' }"
             @click="cambiarTab('ventas')"
           >
@@ -131,8 +141,8 @@ function cambiarTab(tab) {
           </button>
         </li>
         <li class="nav-item">
-          <button 
-            class="nav-link" 
+          <button
+            class="nav-link"
             :class="{ active: tabActiva === 'servicios' }"
             @click="cambiarTab('servicios')"
           >
@@ -140,8 +150,8 @@ function cambiarTab(tab) {
           </button>
         </li>
         <li class="nav-item">
-          <button 
-            class="nav-link" 
+          <button
+            class="nav-link"
             :class="{ active: tabActiva === 'productos' }"
             @click="cambiarTab('productos')"
           >
@@ -149,8 +159,8 @@ function cambiarTab(tab) {
           </button>
         </li>
         <li class="nav-item">
-          <button 
-            class="nav-link" 
+          <button
+            class="nav-link"
             :class="{ active: tabActiva === 'empleados' }"
             @click="cambiarTab('empleados')"
           >
@@ -159,36 +169,29 @@ function cambiarTab(tab) {
         </li>
       </ul>
 
-      <!-- Reporte de Ventas -->
-      <div v-show="tabActiva === 'ventas'">
-        <div class="card shadow-sm border-0 mb-4">
-          <div class="card-header bg-primary text-white">
-            <h6 class="mb-0">
-              <i class="fas fa-filter me-2"></i>Filtros
-            </h6>
-          </div>
+      <div v-show="tabActiva === 'ventas'" class="fade-in">
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
           <div class="card-body">
-            <div class="row g-3">
+            <h6 class="text-muted fw-bold mb-3 text-uppercase small">Filtros de Búsqueda</h6>
+            <div class="row g-3 align-items-end">
               <div class="col-md-3">
-                <label class="form-label">Fecha Inicio</label>
-                <input type="date" v-model="fechaInicio" class="form-control">
+                <label class="form-label small text-muted">Fecha Inicio</label>
+                <input type="date" v-model="fechaInicio" class="form-control bg-light rounded-pill border-0 focus-ring-none">
               </div>
               <div class="col-md-3">
-                <label class="form-label">Fecha Fin</label>
-                <input type="date" v-model="fechaFin" class="form-control">
+                <label class="form-label small text-muted">Fecha Fin</label>
+                <input type="date" v-model="fechaFin" class="form-control bg-light rounded-pill border-0 focus-ring-none">
               </div>
-              <div class="col-md-3">
-                <label class="form-label">Empleado</label>
-                <select v-model="empleadoId" class="form-select">
+              <div class="col-md-2">
+                <label class="form-label small text-muted">Empleado</label>
+                <select v-model="empleadoId" class="form-select bg-light rounded-pill border-0 focus-ring-none">
                   <option value="">Todos</option>
-                  <option v-for="emp in empleados" :key="emp.id" :value="emp.id">
-                    {{ emp.text }}
-                  </option>
+                  <option v-for="emp in empleados" :key="emp.id" :value="emp.id">{{ emp.text }}</option>
                 </select>
               </div>
-              <div class="col-md-3">
-                <label class="form-label">Método de Pago</label>
-                <select v-model="metodoPago" class="form-select">
+              <div class="col-md-2">
+                <label class="form-label small text-muted">Método Pago</label>
+                <select v-model="metodoPago" class="form-select bg-light rounded-pill border-0 focus-ring-none">
                   <option value="">Todos</option>
                   <option value="efectivo">Efectivo</option>
                   <option value="tarjeta">Tarjeta</option>
@@ -196,105 +199,86 @@ function cambiarTab(tab) {
                   <option value="mixto">Mixto</option>
                 </select>
               </div>
-              <div class="col-12">
-                <button 
-                  @click="generarReporteVentas" 
-                  class="btn btn-primary"
-                  :disabled="cargando"
-                >
-                  <i class="fas fa-chart-bar me-2"></i>
-                  {{ cargando ? 'Generando...' : 'Generar Reporte' }}
+              <div class="col-md-2">
+                <button @click="generarReporteVentas" class="btn btn-brand rounded-pill w-100" :disabled="cargando">
+                  <i :class="cargando ? 'fas fa-spinner fa-spin' : 'fas fa-search'" class="me-2"></i> Generar
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Resultados Ventas -->
         <div v-if="reporteVentas">
-          <!-- Resumen -->
           <div class="row g-3 mb-4">
             <div class="col-md-4">
-              <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between">
-                    <div>
-                      <p class="text-muted mb-1">Total Ventas</p>
-                      <h3 class="mb-0 text-success">{{ formatCurrency(reporteVentas.resumen.total_ventas) }}</h3>
-                    </div>
-                    <div class="info-icon bg-success bg-opacity-10 text-success">
-                      <i class="fas fa-dollar-sign fa-2x"></i>
-                    </div>
+              <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body d-flex align-items-center">
+                  <div class="info-icon bg-success-subtle text-success me-3 rounded-circle">
+                    <i class="fas fa-dollar-sign fa-lg"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Total Ventas</p>
+                    <h4 class="mb-0 text-success fw-bold">{{ formatCurrency(reporteVentas.resumen.total_ventas) }}</h4>
                   </div>
                 </div>
               </div>
             </div>
             <div class="col-md-4">
-              <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between">
-                    <div>
-                      <p class="text-muted mb-1">Total Tickets</p>
-                      <h3 class="mb-0 text-primary">{{ reporteVentas.resumen.total_tickets }}</h3>
-                    </div>
-                    <div class="info-icon bg-primary bg-opacity-10 text-primary">
-                      <i class="fas fa-receipt fa-2x"></i>
-                    </div>
+              <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body d-flex align-items-center">
+                  <div class="info-icon bg-primary-subtle text-primary me-3 rounded-circle">
+                    <i class="fas fa-receipt fa-lg"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Total Tickets</p>
+                    <h4 class="mb-0 text-dark fw-bold">{{ reporteVentas.resumen.total_tickets }}</h4>
                   </div>
                 </div>
               </div>
             </div>
             <div class="col-md-4">
-              <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between">
-                    <div>
-                      <p class="text-muted mb-1">Ticket Promedio</p>
-                      <h3 class="mb-0 text-info">{{ formatCurrency(reporteVentas.resumen.ticket_promedio) }}</h3>
-                    </div>
-                    <div class="info-icon bg-info bg-opacity-10 text-info">
-                      <i class="fas fa-chart-line fa-2x"></i>
-                    </div>
+              <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body d-flex align-items-center">
+                  <div class="info-icon bg-info-subtle text-info me-3 rounded-circle">
+                    <i class="fas fa-chart-line fa-lg"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Ticket Promedio</p>
+                    <h4 class="mb-0 text-dark fw-bold">{{ formatCurrency(reporteVentas.resumen.ticket_promedio) }}</h4>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Tabla de Tickets -->
-          <div class="card shadow-sm border-0">
-            <div class="card-header bg-dark text-white">
-              <h6 class="mb-0">Detalle de Tickets</h6>
-            </div>
+          <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
             <div class="table-responsive">
-              <table class="table table-hover mb-0">
-                <thead class="table-light">
+              <table class="table table-hover align-middle mb-0 custom-table">
+                <thead class="bg-light text-muted">
                   <tr>
-                    <th>N° Ticket</th>
-                    <th>Cliente</th>
-                    <th>Empleado</th>
-                    <th>Fecha</th>
-                    <th>Método Pago</th>
-                    <th>Estado</th>
-                    <th class="text-end">Total</th>
+                    <th class="border-0 font-weight-semibold">N° Ticket</th>
+                    <th class="border-0 font-weight-semibold">Cliente</th>
+                    <th class="border-0 font-weight-semibold">Empleado</th>
+                    <th class="border-0 font-weight-semibold">Fecha</th>
+                    <th class="border-0 font-weight-semibold text-center">Método Pago</th>
+                    <th class="border-0 font-weight-semibold text-center">Estado</th>
+                    <th class="border-0 font-weight-semibold text-end">Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="ticket in reporteVentas.tickets" :key="ticket.id">
-                    <td><strong>{{ ticket.numero_ticket }}</strong></td>
-                    <td>{{ ticket.cliente }}</td>
-                    <td>{{ ticket.empleado }}</td>
-                    <td><small>{{ ticket.fecha }}</small></td>
-                    <td><span class="badge bg-secondary">{{ ticket.metodo_pago }}</span></td>
-                    <td>
-                      <span 
-                        class="badge"
+                    <td><strong class="brand-accent">{{ ticket.numero_ticket }}</strong></td>
+                    <td class="text-dark">{{ ticket.cliente }}</td>
+                    <td class="text-secondary small">{{ ticket.empleado }}</td>
+                    <td><span class="text-muted small">{{ ticket.fecha }}</span></td>
+                    <td class="text-center"><span class="badge bg-light text-secondary border rounded-pill px-3">{{ ticket.metodo_pago }}</span></td>
+                    <td class="text-center">
+                      <span class="badge rounded-pill px-3 py-2 text-uppercase fw-medium"
                         :class="{
-                          'bg-success': ticket.estado_pago === 'pagado',
-                          'bg-warning': ticket.estado_pago === 'pendiente',
-                          'bg-info': ticket.estado_pago === 'parcial'
-                        }"
-                      >
+                          'bg-success-subtle text-success': ticket.estado_pago === 'pagado',
+                          'bg-warning-subtle text-warning': ticket.estado_pago === 'pendiente',
+                          'bg-info-subtle text-info': ticket.estado_pago === 'parcial'
+                        }">
                         {{ ticket.estado_pago }}
                       </span>
                     </td>
@@ -307,31 +291,22 @@ function cambiarTab(tab) {
         </div>
       </div>
 
-      <!-- Reporte de Servicios -->
-      <div v-show="tabActiva === 'servicios'">
-        <div class="card shadow-sm border-0 mb-4">
-          <div class="card-header bg-success text-white">
-            <h6 class="mb-0">
-              <i class="fas fa-filter me-2"></i>Filtros
-            </h6>
-          </div>
+      <div v-show="tabActiva === 'servicios'" class="fade-in">
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
           <div class="card-body">
-            <div class="row g-3">
+            <h6 class="text-muted fw-bold mb-3 text-uppercase small">Filtros de Búsqueda</h6>
+            <div class="row g-3 align-items-end">
               <div class="col-md-5">
-                <label class="form-label">Fecha Inicio</label>
-                <input type="date" v-model="fechaInicio" class="form-control">
+                <label class="form-label small text-muted">Fecha Inicio</label>
+                <input type="date" v-model="fechaInicio" class="form-control bg-light rounded-pill border-0 focus-ring-none">
               </div>
               <div class="col-md-5">
-                <label class="form-label">Fecha Fin</label>
-                <input type="date" v-model="fechaFin" class="form-control">
+                <label class="form-label small text-muted">Fecha Fin</label>
+                <input type="date" v-model="fechaFin" class="form-control bg-light rounded-pill border-0 focus-ring-none">
               </div>
-              <div class="col-md-2 d-flex align-items-end">
-                <button 
-                  @click="generarReporteServicios" 
-                  class="btn btn-success w-100"
-                  :disabled="cargando"
-                >
-                  <i class="fas fa-chart-bar me-2"></i>Generar
+              <div class="col-md-2">
+                <button @click="generarReporteServicios" class="btn btn-brand rounded-pill w-100" :disabled="cargando">
+                  <i :class="cargando ? 'fas fa-spinner fa-spin' : 'fas fa-search'" class="me-2"></i> Generar
                 </button>
               </div>
             </div>
@@ -339,46 +314,51 @@ function cambiarTab(tab) {
         </div>
 
         <div v-if="reporteServicios">
-          <!-- Resumen -->
           <div class="row g-3 mb-4">
             <div class="col-md-6">
-              <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                  <p class="text-muted mb-1">Total Servicios Vendidos</p>
-                  <h3 class="mb-0 text-success">{{ reporteServicios.resumen.total_servicios }}</h3>
+              <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body d-flex align-items-center">
+                  <div class="info-icon bg-info-subtle text-info me-3 rounded-circle">
+                    <i class="fas fa-cut fa-lg"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Servicios Realizados</p>
+                    <h4 class="mb-0 text-dark fw-bold">{{ reporteServicios.resumen.total_servicios }}</h4>
+                  </div>
                 </div>
               </div>
             </div>
             <div class="col-md-6">
-              <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                  <p class="text-muted mb-1">Total Ingresos por Servicios</p>
-                  <h3 class="mb-0 text-success">{{ formatCurrency(reporteServicios.resumen.total_ingresos) }}</h3>
+              <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body d-flex align-items-center">
+                  <div class="info-icon bg-success-subtle text-success me-3 rounded-circle">
+                    <i class="fas fa-hand-holding-usd fa-lg"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Ingresos por Servicios</p>
+                    <h4 class="mb-0 text-success fw-bold">{{ formatCurrency(reporteServicios.resumen.total_ingresos) }}</h4>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Tabla -->
-          <div class="card shadow-sm border-0">
-            <div class="card-header bg-success text-white">
-              <h6 class="mb-0">Servicios Más Vendidos</h6>
-            </div>
+          <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
             <div class="table-responsive">
-              <table class="table table-hover mb-0">
-                <thead class="table-light">
+              <table class="table table-hover align-middle mb-0 custom-table">
+                <thead class="bg-light text-muted">
                   <tr>
-                    <th>Servicio</th>
-                    <th class="text-center">Cantidad</th>
-                    <th class="text-end">Precio Promedio</th>
-                    <th class="text-end">Total</th>
+                    <th class="border-0 font-weight-semibold">Servicio</th>
+                    <th class="border-0 font-weight-semibold text-center">Cantidad Realizada</th>
+                    <th class="border-0 font-weight-semibold text-end">Precio Promedio</th>
+                    <th class="border-0 font-weight-semibold text-end">Ingreso Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(servicio, index) in reporteServicios.servicios" :key="index">
-                    <td><strong>{{ servicio.nombre }}</strong></td>
-                    <td class="text-center"><span class="badge bg-primary">{{ servicio.cantidad }}</span></td>
-                    <td class="text-end">${{ servicio.precio_promedio }}</td>
+                    <td><strong class="text-dark">{{ servicio.nombre }}</strong></td>
+                    <td class="text-center"><span class="badge bg-primary-subtle text-primary rounded-pill px-3">{{ servicio.cantidad }}</span></td>
+                    <td class="text-end text-muted">${{ servicio.precio_promedio }}</td>
                     <td class="text-end"><strong class="text-success">${{ servicio.total }}</strong></td>
                   </tr>
                 </tbody>
@@ -388,31 +368,22 @@ function cambiarTab(tab) {
         </div>
       </div>
 
-      <!-- Reporte de Productos -->
-      <div v-show="tabActiva === 'productos'">
-        <div class="card shadow-sm border-0 mb-4">
-          <div class="card-header bg-warning text-dark">
-            <h6 class="mb-0">
-              <i class="fas fa-filter me-2"></i>Filtros
-            </h6>
-          </div>
+      <div v-show="tabActiva === 'productos'" class="fade-in">
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
           <div class="card-body">
-            <div class="row g-3">
+            <h6 class="text-muted fw-bold mb-3 text-uppercase small">Filtros de Búsqueda</h6>
+            <div class="row g-3 align-items-end">
               <div class="col-md-5">
-                <label class="form-label">Fecha Inicio</label>
-                <input type="date" v-model="fechaInicio" class="form-control">
+                <label class="form-label small text-muted">Fecha Inicio</label>
+                <input type="date" v-model="fechaInicio" class="form-control bg-light rounded-pill border-0 focus-ring-none">
               </div>
               <div class="col-md-5">
-                <label class="form-label">Fecha Fin</label>
-                <input type="date" v-model="fechaFin" class="form-control">
+                <label class="form-label small text-muted">Fecha Fin</label>
+                <input type="date" v-model="fechaFin" class="form-control bg-light rounded-pill border-0 focus-ring-none">
               </div>
-              <div class="col-md-2 d-flex align-items-end">
-                <button 
-                  @click="generarReporteProductos" 
-                  class="btn btn-warning w-100"
-                  :disabled="cargando"
-                >
-                  <i class="fas fa-chart-bar me-2"></i>Generar
+              <div class="col-md-2">
+                <button @click="generarReporteProductos" class="btn btn-brand rounded-pill w-100" :disabled="cargando">
+                  <i :class="cargando ? 'fas fa-spinner fa-spin' : 'fas fa-search'" class="me-2"></i> Generar
                 </button>
               </div>
             </div>
@@ -420,58 +391,61 @@ function cambiarTab(tab) {
         </div>
 
         <div v-if="reporteProductos">
-          <!-- Resumen -->
           <div class="row g-3 mb-4">
             <div class="col-md-6">
-              <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                  <p class="text-muted mb-1">Total Productos Vendidos</p>
-                  <h3 class="mb-0 text-warning">{{ reporteProductos.resumen.total_productos }}</h3>
+              <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body d-flex align-items-center">
+                  <div class="info-icon bg-warning-subtle text-warning me-3 rounded-circle">
+                    <i class="fas fa-box-open fa-lg"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Productos Vendidos</p>
+                    <h4 class="mb-0 text-dark fw-bold">{{ reporteProductos.resumen.total_productos }}</h4>
+                  </div>
                 </div>
               </div>
             </div>
             <div class="col-md-6">
-              <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                  <p class="text-muted mb-1">Total Ingresos por Productos</p>
-                  <h3 class="mb-0 text-warning">{{ formatCurrency(reporteProductos.resumen.total_ingresos) }}</h3>
+              <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body d-flex align-items-center">
+                  <div class="info-icon bg-success-subtle text-success me-3 rounded-circle">
+                    <i class="fas fa-coins fa-lg"></i>
+                  </div>
+                  <div>
+                    <p class="text-muted mb-0 small text-uppercase fw-semibold">Ingresos por Productos</p>
+                    <h4 class="mb-0 text-success fw-bold">{{ formatCurrency(reporteProductos.resumen.total_ingresos) }}</h4>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Tabla -->
-          <div class="card shadow-sm border-0">
-            <div class="card-header bg-warning text-dark">
-              <h6 class="mb-0">Productos Más Vendidos</h6>
-            </div>
+          <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
             <div class="table-responsive">
-              <table class="table table-hover mb-0">
-                <thead class="table-light">
+              <table class="table table-hover align-middle mb-0 custom-table">
+                <thead class="bg-light text-muted">
                   <tr>
-                    <th>Código</th>
-                    <th>Producto</th>
-                    <th>Marca</th>
-                    <th class="text-center">Cantidad</th>
-                    <th class="text-center">Stock</th>
-                    <th class="text-end">Total</th>
+                    <th class="border-0 font-weight-semibold">Código</th>
+                    <th class="border-0 font-weight-semibold">Producto</th>
+                    <th class="border-0 font-weight-semibold">Marca</th>
+                    <th class="border-0 font-weight-semibold text-center">Cant. Vendida</th>
+                    <th class="border-0 font-weight-semibold text-center">Stock Actual</th>
+                    <th class="border-0 font-weight-semibold text-end">Ingreso Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(producto, index) in reporteProductos.productos" :key="index">
-                    <td><code>{{ producto.codigo }}</code></td>
-                    <td><strong>{{ producto.nombre }}</strong></td>
-                    <td>{{ producto.marca || '-' }}</td>
-                    <td class="text-center"><span class="badge bg-primary">{{ producto.cantidad }}</span></td>
+                    <td><code class="text-muted bg-light px-2 py-1 rounded">{{ producto.codigo }}</code></td>
+                    <td><strong class="text-dark">{{ producto.nombre }}</strong></td>
+                    <td class="text-secondary small">{{ producto.marca || '-' }}</td>
+                    <td class="text-center"><span class="badge bg-primary-subtle text-primary rounded-pill px-3">{{ producto.cantidad }}</span></td>
                     <td class="text-center">
-                      <span 
-                        class="badge"
+                      <span class="badge rounded-pill px-3"
                         :class="{
-                          'bg-success': producto.stock_actual > 10,
-                          'bg-warning text-dark': producto.stock_actual > 0 && producto.stock_actual <= 10,
-                          'bg-danger': producto.stock_actual === 0
-                        }"
-                      >
+                          'bg-success-subtle text-success': producto.stock_actual > 10,
+                          'bg-warning-subtle text-warning': producto.stock_actual > 0 && producto.stock_actual <= 10,
+                          'bg-danger-subtle text-danger': producto.stock_actual === 0
+                        }">
                         {{ producto.stock_actual }}
                       </span>
                     </td>
@@ -484,60 +458,55 @@ function cambiarTab(tab) {
         </div>
       </div>
 
-      <!-- Reporte de Empleados -->
-      <div v-show="tabActiva === 'empleados'">
-        <div class="card shadow-sm border-0 mb-4">
-          <div class="card-header bg-info text-white">
-            <h6 class="mb-0">
-              <i class="fas fa-filter me-2"></i>Filtros
-            </h6>
-          </div>
+      <div v-show="tabActiva === 'empleados'" class="fade-in">
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
           <div class="card-body">
-            <div class="row g-3">
+            <h6 class="text-muted fw-bold mb-3 text-uppercase small">Filtros de Búsqueda</h6>
+            <div class="row g-3 align-items-end">
               <div class="col-md-5">
-                <label class="form-label">Fecha Inicio</label>
-                <input type="date" v-model="fechaInicio" class="form-control">
+                <label class="form-label small text-muted">Fecha Inicio</label>
+                <input type="date" v-model="fechaInicio" class="form-control bg-light rounded-pill border-0 focus-ring-none">
               </div>
               <div class="col-md-5">
-                <label class="form-label">Fecha Fin</label>
-                <input type="date" v-model="fechaFin" class="form-control">
+                <label class="form-label small text-muted">Fecha Fin</label>
+                <input type="date" v-model="fechaFin" class="form-control bg-light rounded-pill border-0 focus-ring-none">
               </div>
-              <div class="col-md-2 d-flex align-items-end">
-                <button 
-                  @click="generarReporteEmpleados" 
-                  class="btn btn-info w-100"
-                  :disabled="cargando"
-                >
-                  <i class="fas fa-chart-bar me-2"></i>Generar
+              <div class="col-md-2">
+                <button @click="generarReporteEmpleados" class="btn btn-brand rounded-pill w-100" :disabled="cargando">
+                  <i :class="cargando ? 'fas fa-spinner fa-spin' : 'fas fa-search'" class="me-2"></i> Generar
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <div v-if="reporteEmpleados" class="card shadow-sm border-0">
-          <div class="card-header bg-info text-white">
-            <h6 class="mb-0">Rendimiento por Empleado</h6>
-          </div>
+        <div v-if="reporteEmpleados" class="card shadow-sm border-0 rounded-4 overflow-hidden">
           <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
+            <table class="table table-hover align-middle mb-0 custom-table">
+              <thead class="bg-light text-muted">
                 <tr>
-                  <th>Empleado</th>
-                  <th>Puesto</th>
-                  <th class="text-center">Tickets</th>
-                  <th class="text-center">Agendas</th>
-                  <th class="text-end">Ticket Promedio</th>
-                  <th class="text-end">Total Ventas</th>
+                  <th class="border-0 font-weight-semibold">Empleado</th>
+                  <th class="border-0 font-weight-semibold">Puesto</th>
+                  <th class="border-0 font-weight-semibold text-center">Total Tickets</th>
+                  <th class="border-0 font-weight-semibold text-center">Agendas Completadas</th>
+                  <th class="border-0 font-weight-semibold text-end">Ticket Promedio</th>
+                  <th class="border-0 font-weight-semibold text-end">Ventas Generadas</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(empleado, index) in reporteEmpleados.empleados" :key="index">
-                  <td><strong>{{ empleado.nombre }}</strong></td>
-                  <td><small class="text-muted">{{ empleado.puesto }}</small></td>
-                  <td class="text-center"><span class="badge bg-primary">{{ empleado.total_tickets }}</span></td>
-                  <td class="text-center"><span class="badge bg-success">{{ empleado.agendas_completadas }}</span></td>
-                  <td class="text-end">${{ empleado.ticket_promedio }}</td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="bg-secondary-subtle text-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                        <i class="fas fa-user-tie"></i>
+                      </div>
+                      <strong class="text-dark">{{ empleado.nombre }}</strong>
+                    </div>
+                  </td>
+                  <td><span class="text-muted small">{{ empleado.puesto }}</span></td>
+                  <td class="text-center"><span class="badge bg-light border text-secondary rounded-pill px-3">{{ empleado.total_tickets }}</span></td>
+                  <td class="text-center"><span class="badge bg-success-subtle text-success rounded-pill px-3">{{ empleado.agendas_completadas }}</span></td>
+                  <td class="text-end text-muted">${{ empleado.ticket_promedio }}</td>
                   <td class="text-end"><strong class="text-success">${{ empleado.total_ventas }}</strong></td>
                 </tr>
               </tbody>
@@ -551,36 +520,87 @@ function cambiarTab(tab) {
 </template>
 
 <style scoped>
+/* Variables y colores principales */
+.brand-accent { color: #d84b72; }
+.btn-brand { background-color: #d84b72; color: white; transition: all 0.3s ease; }
+.btn-brand:hover { background-color: #c03d61; color: white; transform: translateY(-2px); }
+.btn-brand:disabled { opacity: 0.7; transform: none; }
+
+/* Modificadores de inputs */
+.focus-ring-none:focus { box-shadow: none; outline: 1px solid #d84b72; }
+
+/* Navegación por Tabs Estilizada */
+.custom-tabs {
+  border-bottom: 2px solid #e9ecef !important;
+  gap: 0.5rem;
+}
+.custom-tabs .nav-link {
+  color: #6c757d;
+  font-weight: 500;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.custom-tabs .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+.custom-tabs .nav-link:hover {
+  color: #d84b72;
+  background-color: rgba(216, 75, 114, 0.05);
+}
+.custom-tabs .nav-link.active {
+  color: #d84b72;
+  background-color: transparent;
+}
+.custom-tabs .nav-link.active::after {
+  background-color: #d84b72;
+}
+
+/* Íconos de KPI */
 .info-icon {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
 }
 
-.nav-tabs .nav-link {
-  color: #6c757d;
-  border: none;
-  border-bottom: 3px solid transparent;
+/* Tabla personalizada */
+.custom-table th {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+.custom-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+.custom-table tbody tr:hover {
+  background-color: #f8f9fa;
 }
 
-.nav-tabs .nav-link:hover {
-  border-color: #dee2e6;
-}
+/* Clases sutiles para Bootstrap */
+.bg-warning-subtle { background-color: #fff3cd !important; }
+.bg-success-subtle { background-color: #d1e7dd !important; }
+.bg-danger-subtle { background-color: #f8d7da !important; }
+.bg-info-subtle { background-color: #cff4fc !important; }
+.bg-secondary-subtle { background-color: #e2e3e5 !important; }
+.bg-primary-subtle { background-color: #cfe2ff !important; }
 
-.nav-tabs .nav-link.active {
-  color: #0d6efd;
-  border-bottom-color: #0d6efd;
-  background: none;
+/* Animaciones */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
 }
-
-.table tbody tr {
-  transition: background-color 0.2s;
-}
-
-.table tbody tr:hover {
-  background-color: rgba(0, 123, 255, 0.05);
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>

@@ -1,8 +1,9 @@
 <script setup>
-import { router } from '@inertiajs/vue3'
+import { ref, watch } from 'vue'
+import { router, Link } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
-import { ref } from 'vue'
 import Swal from 'sweetalert2'
+import debounce from 'lodash.debounce'
 
 const props = defineProps({
   servicios: Object,
@@ -15,7 +16,8 @@ const categoria = ref(props.filters.categoria || '')
 const activo = ref(props.filters.activo || '')
 const duracion = ref(props.filters.duracion || '')
 
-function filtrar() {
+// Filtrado con debounce para la búsqueda optimizada
+const filtrar = debounce(() => {
   router.get('/servicios', {
     search: search.value,
     categoria: categoria.value,
@@ -25,26 +27,52 @@ function filtrar() {
     preserveState: true,
     replace: true,
   })
-}
+}, 300)
+
+// Observar cambios en búsqueda para disparar el filtro automáticamente
+watch(search, () => filtrar())
+
+// SweetAlert estilizado para coincidir con el diseño
+const swalEstilizado = Swal.mixin({
+  customClass: {
+    confirmButton: 'btn btn-brand text-white rounded-pill px-4',
+    cancelButton: 'btn btn-secondary rounded-pill px-4 ms-2',
+    denyButton: 'btn btn-danger text-white rounded-pill px-4'
+  },
+  buttonsStyling: false
+})
 
 function eliminarServicio(id) {
   Swal.fire({
     title: "¿Eliminar servicio?",
-    text: "Esta acción no se puede deshacer",
+    text: "Esta acción no se puede deshacer.",
     icon: "warning",
     showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
+    customClass: {
+      confirmButton: 'btn btn-danger text-white rounded-pill px-4',
+      cancelButton: 'btn btn-secondary rounded-pill px-4 ms-2'
+    },
+    buttonsStyling: false,
     confirmButtonText: "Sí, eliminar",
     cancelButtonText: "Cancelar",
   }).then(result => {
     if (result.isConfirmed) {
       router.delete(`/servicios/${id}`, {
         onSuccess: () => {
-          Swal.fire("Eliminado", "Servicio eliminado exitosamente", "success")
+          Swal.fire({
+            title: "Eliminado",
+            text: "Servicio eliminado exitosamente",
+            icon: "success",
+            confirmButtonColor: '#d84b72'
+          })
         },
         onError: () => {
-          Swal.fire("Error", "No se pudo eliminar el servicio", "error")
+          Swal.fire({
+            title: "Error",
+            text: "No se pudo eliminar el servicio",
+            icon: "error",
+            confirmButtonColor: '#d84b72'
+          })
         }
       })
     }
@@ -52,9 +80,9 @@ function eliminarServicio(id) {
 }
 
 function duplicarServicio(id) {
-  Swal.fire({
+  swalEstilizado.fire({
     title: "¿Duplicar servicio?",
-    text: "Se creará una copia del servicio",
+    text: "Se creará una copia idéntica del servicio.",
     icon: "question",
     showCancelButton: true,
     confirmButtonText: "Sí, duplicar",
@@ -63,7 +91,12 @@ function duplicarServicio(id) {
     if (result.isConfirmed) {
       router.post(`/servicios/${id}/duplicar`, {}, {
         onSuccess: () => {
-          Swal.fire("Duplicado", "Servicio duplicado exitosamente", "success")
+          Swal.fire({
+            title: "Duplicado",
+            text: "Servicio duplicado exitosamente",
+            icon: "success",
+            confirmButtonColor: '#d84b72'
+          })
         }
       })
     }
@@ -79,59 +112,56 @@ function exportarServicios() {
   })
 }
 
+// Retorna clases sutiles corporativas según la duración
 function getDuracionClass(minutos) {
-  if (minutos <= 30) return 'badge bg-success'
-  if (minutos <= 60) return 'badge bg-warning text-dark'
-  return 'badge bg-danger'
+  if (minutos <= 30) return 'badge rounded-pill bg-success-subtle text-success fw-medium px-3'
+  if (minutos <= 60) return 'badge rounded-pill bg-warning-subtle text-warning fw-medium px-3'
+  return 'badge rounded-pill bg-danger-subtle text-danger fw-medium px-3'
 }
 </script>
 
 <template>
   <AdminLayout title="Servicios">
-    <div class="container-fluid px-3">
+    <div class="container-fluid px-0 px-md-3">
 
-      <!-- Header -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4">
-        <h1 class="h4 text-pink fw-bold">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <h1 class="h4 brand-accent fw-bold mb-0">
           <i class="fas fa-cut me-2"></i> Gestionar Servicios
         </h1>
-        <div class="btn-group">
-          <button @click="exportarServicios" class="btn btn-success">
+        <div class="d-flex gap-2">
+          <button @click="exportarServicios" class="btn btn-light rounded-pill px-4 shadow-sm text-success fw-medium">
             <i class="fas fa-file-excel me-2"></i> Exportar
           </button>
-          <a href="/servicios/create" class="btn btn-primary">
+          <Link href="/servicios/create" class="btn btn-brand rounded-pill px-4 shadow-sm">
             <i class="fas fa-plus me-2"></i> Nuevo Servicio
-          </a>
+          </Link>
         </div>
       </div>
 
-      <!-- Filtros -->
-      <div class="card shadow-sm border-0 mb-3">
-        <div class="card-body row g-2">
-
-          <div class="col-md-3">
+      <div class="card shadow-sm border-0 mb-4 rounded-4">
+        <div class="card-body row g-3">
+          <div class="col-12 col-md-3">
             <div class="input-group">
-              <span class="input-group-text bg-light">
-                <i class="fas fa-search"></i>
+              <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                <i class="fas fa-search text-muted"></i>
               </span>
-              <input 
-                class="form-control" 
-                v-model="search" 
-                @input="filtrar" 
+              <input
+                class="form-control border-start-0 bg-light rounded-end-pill focus-ring-none"
+                v-model="search"
                 placeholder="Buscar servicio..."
               >
             </div>
           </div>
 
-          <div class="col-md-2">
-            <select v-model="categoria" @change="filtrar" class="form-select">
+          <div class="col-6 col-md-2">
+            <select v-model="categoria" @change="filtrar" class="form-select bg-light rounded-pill border-0">
               <option value="">Todas las categorías</option>
               <option v-for="cat in categorias" :key="cat" :value="cat">{{ cat }}</option>
             </select>
           </div>
 
-          <div class="col-md-2">
-            <select v-model="duracion" @change="filtrar" class="form-select">
+          <div class="col-6 col-md-2">
+            <select v-model="duracion" @change="filtrar" class="form-select bg-light rounded-pill border-0">
               <option value="">Todas las duraciones</option>
               <option value="corta">Corta (≤30 min)</option>
               <option value="media">Media (31-60 min)</option>
@@ -139,55 +169,51 @@ function getDuracionClass(minutos) {
             </select>
           </div>
 
-          <div class="col-md-2">
-            <select v-model="activo" @change="filtrar" class="form-select">
-              <option value="">Todos</option>
+          <div class="col-6 col-md-2">
+            <select v-model="activo" @change="filtrar" class="form-select bg-light rounded-pill border-0">
+              <option value="">Todos los estados</option>
               <option value="1">Activos</option>
               <option value="0">Inactivos</option>
             </select>
           </div>
 
-          <div class="col-md-3">
-            <button @click="search = ''; categoria = ''; activo = ''; duracion = ''; filtrar()" class="btn btn-secondary w-100">
-              <i class="fas fa-redo me-2"></i> Limpiar Filtros
+          <div class="col-6 col-md-3">
+            <button @click="search = ''; categoria = ''; activo = ''; duracion = ''; filtrar()" class="btn btn-light rounded-pill w-100 text-muted">
+              <i class="fas fa-redo me-1"></i> Limpiar Filtros
             </button>
           </div>
-
         </div>
       </div>
 
-      <!-- Tabla -->
-      <div class="card shadow-sm border-0">
+      <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
+          <table class="table table-hover align-middle mb-0 custom-table">
+            <thead class="bg-light text-muted">
               <tr>
-                <th class="text-center">Orden</th>
-                <th>Servicio</th>
-                <th>Categoría</th>
-                <th class="text-center">Duración</th>
-                <th class="text-end">Precio</th>
-                <th class="text-center">Depósito</th>
-                <th class="text-center">Estado</th>
-                <th class="text-center">Acciones</th>
+                <th class="text-center border-0 font-weight-semibold">Orden</th>
+                <th class="border-0 font-weight-semibold">Servicio</th>
+                <th class="border-0 font-weight-semibold">Categoría</th>
+                <th class="text-center border-0 font-weight-semibold">Duración</th>
+                <th class="text-end border-0 font-weight-semibold">Precio</th>
+                <th class="text-center border-0 font-weight-semibold">Depósito</th>
+                <th class="text-center border-0 font-weight-semibold">Estado</th>
+                <th class="text-center border-0 font-weight-semibold">Acciones</th>
               </tr>
             </thead>
 
             <tbody>
               <tr v-for="servicio in servicios.data" :key="servicio.id">
-                
-                <!-- ORDEN -->
+
                 <td class="text-center">
-                  <span class="badge bg-secondary">
+                  <span class="badge rounded-pill bg-light border text-secondary fw-medium px-3">
                     {{ servicio.orden }}
                   </span>
                 </td>
 
-                <!-- SERVICIO -->
                 <td>
                   <div>
-                    <strong>{{ servicio.nombre }}</strong>
-                    <div v-if="servicio.descripcion">
+                    <strong class="text-dark">{{ servicio.nombre }}</strong>
+                    <div v-if="servicio.descripcion" class="mt-1">
                       <small class="text-muted">
                         {{ servicio.descripcion.substring(0, 60) }}{{ servicio.descripcion.length > 60 ? '...' : '' }}
                       </small>
@@ -195,76 +221,70 @@ function getDuracionClass(minutos) {
                   </div>
                 </td>
 
-                <!-- CATEGORÍA -->
                 <td>
-                  <span v-if="servicio.categoria" class="badge bg-info">
+                  <span v-if="servicio.categoria" class="badge rounded-pill bg-info-subtle text-info fw-medium px-3">
                     {{ servicio.categoria }}
                   </span>
-                  <span v-else class="text-muted">-</span>
+                  <span v-else class="text-muted small fst-italic">Sin categoría</span>
                 </td>
 
-                <!-- DURACIÓN -->
                 <td class="text-center">
                   <span :class="getDuracionClass(servicio.duracion_minutos)">
                     <i class="fas fa-clock fa-xs me-1"></i>{{ servicio.duracion_minutos }} min
                   </span>
                 </td>
 
-                <!-- PRECIO -->
                 <td class="text-end">
                   <strong class="text-success">${{ servicio.precio }}</strong>
                 </td>
 
-                <!-- DEPÓSITO -->
                 <td class="text-center">
                   <div v-if="servicio.requiere_deposito">
-                    <span class="badge bg-warning text-dark">
-                      <i class="fas fa-dollar-sign fa-xs"></i> Requiere
+                    <span class="badge rounded-pill bg-warning-subtle text-warning fw-medium px-3">
+                      <i class="fas fa-lock fa-xs me-1"></i> Requiere
                     </span>
-                    <div v-if="servicio.deposito_minimo">
-                      <small class="text-muted">${{ servicio.deposito_minimo }}</small>
+                    <div v-if="servicio.deposito_minimo" class="mt-1">
+                      <small class="text-muted fw-semibold">${{ servicio.deposito_minimo }}</small>
                     </div>
                   </div>
                   <span v-else class="text-muted">-</span>
                 </td>
 
-                <!-- ESTADO -->
                 <td class="text-center">
-                  <span 
-                    class="badge px-3 py-2"
-                    :class="servicio.activo ? 'bg-success' : 'bg-secondary'"
+                  <span
+                    class="badge rounded-pill px-3 py-2 fw-medium"
+                    :class="servicio.activo ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'"
                   >
                     {{ servicio.activo ? 'ACTIVO' : 'INACTIVO' }}
                   </span>
                 </td>
 
-                <!-- ACCIONES -->
                 <td class="text-center">
-                  <div class="btn-group">
-                    <a 
-                      :href="`/servicios/${servicio.id}`" 
-                      class="btn btn-sm btn-outline-info"
+                  <div class="d-flex justify-content-center gap-2">
+                    <Link
+                      :href="`/servicios/${servicio.id}`"
+                      class="btn btn-sm btn-light text-info rounded-circle action-btn"
                       title="Ver detalles"
                     >
                       <i class="fas fa-eye"></i>
-                    </a>
-                    <a 
-                      :href="`/servicios/${servicio.id}/edit`" 
-                      class="btn btn-sm btn-outline-warning"
+                    </Link>
+                    <Link
+                      :href="`/servicios/${servicio.id}/edit`"
+                      class="btn btn-sm btn-light text-warning rounded-circle action-btn"
                       title="Editar"
                     >
                       <i class="fas fa-edit"></i>
-                    </a>
-                    <button 
-                      @click="duplicarServicio(servicio.id)" 
-                      class="btn btn-sm btn-outline-primary"
+                    </Link>
+                    <button
+                      @click="duplicarServicio(servicio.id)"
+                      class="btn btn-sm btn-light text-primary rounded-circle action-btn"
                       title="Duplicar"
                     >
                       <i class="fas fa-copy"></i>
                     </button>
-                    <button 
-                      @click="eliminarServicio(servicio.id)" 
-                      class="btn btn-sm btn-outline-danger"
+                    <button
+                      @click="eliminarServicio(servicio.id)"
+                      class="btn btn-sm btn-light text-danger rounded-circle action-btn"
                       title="Eliminar"
                     >
                       <i class="fas fa-trash"></i>
@@ -275,18 +295,19 @@ function getDuracionClass(minutos) {
               </tr>
 
               <tr v-if="!servicios.data.length">
-                <td colspan="8" class="text-center text-muted py-5">
-                  <i class="fas fa-scissors fa-3x mb-3 d-block"></i>
-                  <p class="mb-0">No hay servicios registrados con los filtros seleccionados.</p>
+                <td colspan="8" class="text-center py-5">
+                  <div class="text-muted d-flex flex-column align-items-center">
+                    <i class="fas fa-scissors fa-3x mb-3 text-light"></i>
+                    <h5 class="fw-medium text-secondary">Sin resultados</h5>
+                    <p class="mb-0 small">No hay servicios registrados con los filtros seleccionados.</p>
+                  </div>
                 </td>
               </tr>
-
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Paginación -->
       <nav class="mt-4" v-if="servicios.data.length">
         <ul class="pagination justify-content-center flex-wrap">
           <li
@@ -296,7 +317,7 @@ function getDuracionClass(minutos) {
             :class="{ active: link.active, disabled: !link.url }"
           >
             <button
-              class="page-link"
+              class="page-link shadow-sm border-0 mx-1 rounded-2"
               v-html="link.label"
               @click="link.url && router.get(link.url, {}, { preserveState: true })"
             />
@@ -309,21 +330,79 @@ function getDuracionClass(minutos) {
 </template>
 
 <style scoped>
-.badge {
+/* Variables y colores principales */
+.brand-accent {
+  color: #d84b72;
+}
+
+.btn-brand {
+  background-color: #d84b72;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-brand:hover {
+  background-color: #c03d61;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Modificadores de inputs */
+.focus-ring-none:focus {
+  box-shadow: none;
+  border-color: #dee2e6;
+}
+
+/* Tabla personalizada */
+.custom-table th {
+  text-transform: uppercase;
   font-size: 0.75rem;
-  font-weight: 600;
   letter-spacing: 0.5px;
 }
 
-.btn-group .btn {
-  padding: 0.25rem 0.5rem;
+.custom-table tbody tr {
+  transition: background-color 0.2s ease;
 }
 
-.table tbody tr {
-  transition: background-color 0.2s;
+.custom-table tbody tr:hover {
+  background-color: #f8f9fa;
 }
 
-.table tbody tr:hover {
-  background-color: rgba(0, 123, 255, 0.05);
+/* Botones de acción */
+.action-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background-color: #f8f9fa;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+  background-color: #e9ecef;
+}
+
+/* Clases sutiles para Bootstrap (Por si usas una versión anterior a 5.3) */
+.bg-warning-subtle { background-color: #fff3cd !important; }
+.bg-success-subtle { background-color: #d1e7dd !important; }
+.bg-danger-subtle { background-color: #f8d7da !important; }
+.bg-info-subtle { background-color: #cff4fc !important; }
+.bg-secondary-subtle { background-color: #e2e3e5 !important; }
+
+/* Paginación corporativa */
+.page-link {
+  color: #6c757d;
+}
+
+.page-link:hover {
+  color: #d84b72;
+  background-color: #f8f9fa;
+}
+
+.page-item.active .page-link {
+  background-color: #d84b72;
+  color: white;
 }
 </style>
