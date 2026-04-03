@@ -1,8 +1,7 @@
 <script setup>
-import {useForm, Link } from '@inertiajs/vue3'
+import { useForm, Link } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import { ref, computed, onMounted } from 'vue'
-
 
 const props = defineProps({
   clientes: Array,
@@ -37,7 +36,6 @@ function submit() {
 }
 
 onMounted(() => {
-
   $('#cliente-select').select2({
     placeholder: 'Buscar o Seleccione un cliente',
     allowClear: true,
@@ -45,72 +43,66 @@ onMounted(() => {
     data: props.clientes.map((e) => ({
         id: e.id,
         text: e.nombre_completo,
-
     })),
   }).on('change', function() {
     form.cliente_id = $(this).val() || [];
   })
 
-  $('#empleado-select')
-   .select2({
-        width: '100%',
-        placeholder: 'Buscar o Seleccione un empleado',
-        allowClear: true,
-      
-        data: props.empleados.map((e) => ({
-            id: e.id,
-            text: e.nombre_completo,
-        })),
-   }).on('change', function() {
+  $('#empleado-select').select2({
+    width: '100%',
+    placeholder: 'Buscar o Seleccione un empleado',
+    allowClear: true,
+    data: props.empleados.map((e) => ({
+        id: e.id,
+        text: e.nombre_completo,
+    })),
+  }).on('change', function() {
     form.empleado_id = $(this).val() || [];
-   })
+  })
 
-   // SERVICIOS
-  $("#servicios-select")
-    .select2({
-      width: "100%",
-      placeholder: 'Buscar o Seleccione servicios',
-      multiple: true,
-      data: props.servicios.map((s) => ({
-        id: s.id,
-        text: `${s.nombre} - ${s.duracion_minutos} min - $${s.precio}`,
-      })),
-    })
-    .on("change", () => {
-      const ids = $("#servicios-select").val() || [];
-      serviciosSeleccionados.value = props.servicios.filter((s) =>
-        ids.includes(String(s.id))
-      );
-    });
+  // SERVICIOS
+  $("#servicios-select").select2({
+    width: "100%",
+    placeholder: 'Buscar o Seleccione servicios',
+    multiple: true,
+    data: props.servicios.map((s) => ({
+      id: s.id,
+      text: `${s.nombre} - ${s.duracion_minutos} min - $${s.precio}`,
+    })),
+  }).on("change", () => {
+    const ids = $("#servicios-select").val() || [];
+    serviciosSeleccionados.value = props.servicios.filter((s) =>
+      ids.includes(String(s.id))
+    );
+  });
 })
 </script>
 
 <template>
   <AdminLayout title="Nueva Agenda">
-    <div class="container-fluid px-3">
+    <div class="container-fluid px-0 px-md-3">
 
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h4 text-primary fw-bold">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <h1 class="h4 brand-accent fw-bold mb-0">
           <i class="fas fa-calendar-plus me-2"></i> Nueva Agenda
         </h1>
-        <a href="/agendas" class="btn btn-secondary">
+        <Link href="/agendas" class="btn btn-light rounded-pill px-4 shadow-sm text-muted fw-medium">
           <i class="fas fa-arrow-left me-2"></i> Volver
-        </a>
+        </Link>
       </div>
 
       <form @submit.prevent="submit">
         <div class="row g-3">
 
-          <!-- Cliente -->
           <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-              <div class="card-body">
-                <label class="form-label fw-semibold">
-                  <i class="fas fa-user text-primary me-2"></i> Cliente *
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+              <div class="card-body p-4">
+                <label class="form-label fw-semibold text-dark">
+                  <i class="fas fa-user text-primary me-2"></i> Cliente <span class="text-danger">*</span>
                 </label>
                 <select
                   id="cliente-select"
-                  class="form-select"
+                  class="form-select bg-light border-0 rounded-3 focus-ring-none"
                   :class="{ 'is-invalid': form.errors.cliente_id }"
                 ></select>
                 <div v-if="form.errors.cliente_id" class="invalid-feedback d-block">
@@ -120,16 +112,15 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Empleado -->
           <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-              <div class="card-body">
-                <label class="form-label fw-semibold">
-                  <i class="fas fa-user-tie text-success me-2"></i> Empleado *
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+              <div class="card-body p-4">
+                <label class="form-label fw-semibold text-dark">
+                  <i class="fas fa-user-tie text-success me-2"></i> Empleado <span class="text-danger">*</span>
                 </label>
                 <select
                   id="empleado-select"
-                  class="form-select"
+                  class="form-select bg-light border-0 rounded-3 focus-ring-none"
                   :class="{ 'is-invalid': form.errors.empleado_id }"
                 ></select>
                 <div v-if="form.errors.empleado_id" class="invalid-feedback d-block">
@@ -139,17 +130,16 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Fecha y Hora -->
           <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-              <div class="card-body">
-                <label class="form-label fw-semibold">
-                  <i class="fas fa-calendar text-info me-2"></i> Fecha y Hora de Inicio *
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+              <div class="card-body p-4">
+                <label class="form-label fw-semibold text-dark">
+                  <i class="fas fa-calendar-alt text-info me-2"></i> Fecha y Hora de Inicio <span class="text-danger">*</span>
                 </label>
                 <input
                   type="datetime-local"
                   v-model="form.fecha_hora_inicio"
-                  class="form-control"
+                  class="form-control bg-light border-0 rounded-3 focus-ring-none py-2"
                   :class="{ 'is-invalid': form.errors.fecha_hora_inicio }"
                   required
                 >
@@ -160,16 +150,15 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Tipo -->
           <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-              <div class="card-body">
-                <label class="form-label fw-semibold">
-                  <i class="fas fa-tag text-warning me-2"></i> Tipo de Cita *
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+              <div class="card-body p-4">
+                <label class="form-label fw-semibold text-dark">
+                  <i class="fas fa-tag text-warning me-2"></i> Tipo de Cita <span class="text-danger">*</span>
                 </label>
                 <select
                   v-model="form.tipo"
-                  class="form-select"
+                  class="form-select bg-light border-0 rounded-3 focus-ring-none py-2"
                   :class="{ 'is-invalid': form.errors.tipo }"
                 >
                   <option value="estandar">Estándar (Cita programada)</option>
@@ -182,45 +171,49 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Servicios -->
           <div class="col-12">
-            <div class="card shadow-sm border-0">
-              <div class="card-body">
-                <label class="form-label fw-semibold">
-                  <i class="fas fa-cut text-danger me-2"></i> Servicios *
+            <div class="card shadow-sm border-0 rounded-4">
+              <div class="card-body p-4">
+                <label class="form-label fw-semibold text-dark">
+                  <i class="fas fa-cut text-danger me-2"></i> Servicios <span class="text-danger">*</span>
                 </label>
                 <select
                   id="servicios-select"
-                  class="form-select"
+                  class="form-select bg-light border-0 rounded-3 focus-ring-none"
                   :class="{ 'is-invalid': form.errors.servicios }"
                 ></select>
                 <div v-if="form.errors.servicios" class="invalid-feedback d-block">
                   {{ form.errors.servicios }}
                 </div>
 
-                <!-- Tabla de servicios seleccionados -->
-                <div v-if="serviciosSeleccionados.length" class="mt-3">
+                <div v-if="serviciosSeleccionados.length" class="mt-4 border rounded-4 overflow-hidden">
                   <div class="table-responsive">
-                    <table class="table table-sm table-bordered">
-                      <thead class="table-light">
+                    <table class="table table-hover align-middle mb-0 custom-table">
+                      <thead class="bg-light text-muted">
                         <tr>
-                          <th>Servicio</th>
-                          <th class="text-center">Duración</th>
-                          <th class="text-end">Precio</th>
+                          <th class="border-0 font-weight-semibold ps-4">Servicio</th>
+                          <th class="text-center border-0 font-weight-semibold">Duración</th>
+                          <th class="text-end border-0 font-weight-semibold pe-4">Precio</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr v-for="srv in serviciosSeleccionados" :key="srv.id">
-                          <td>{{ srv.nombre }}</td>
-                          <td class="text-center">{{ srv.duracion_minutos }} min</td>
-                          <td class="text-end">${{ srv.precio }}</td>
-                        </tr>
-                        <tr class="table-active fw-bold">
-                          <td>TOTAL</td>
-                          <td class="text-center">{{ duracionTotal }} min</td>
-                          <td class="text-end text-success">${{ totalGeneral.toFixed(2) }}</td>
+                          <td class="ps-4 fw-medium text-dark">{{ srv.nombre }}</td>
+                          <td class="text-center">
+                            <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2 fw-medium">
+                              {{ srv.duracion_minutos }} min
+                            </span>
+                          </td>
+                          <td class="text-end pe-4 text-dark fw-medium">${{ parseFloat(srv.precio).toFixed(2) }}</td>
                         </tr>
                       </tbody>
+                      <tfoot class="bg-light">
+                        <tr>
+                          <td class="fw-bold ps-4 text-dark">TOTAL</td>
+                          <td class="text-center fw-bold text-dark">{{ duracionTotal }} min</td>
+                          <td class="text-end pe-4 fw-bold brand-accent fs-5">${{ totalGeneral.toFixed(2) }}</td>
+                        </tr>
+                      </tfoot>
                     </table>
                   </div>
                 </div>
@@ -228,18 +221,17 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Notas -->
           <div class="col-12">
-            <div class="card shadow-sm border-0">
-              <div class="card-body">
-                <label class="form-label fw-semibold">
-                  <i class="fas fa-sticky-note text-secondary me-2"></i> Notas
+            <div class="card shadow-sm border-0 rounded-4">
+              <div class="card-body p-4">
+                <label class="form-label fw-semibold text-dark">
+                  <i class="fas fa-sticky-note text-secondary me-2"></i> Notas y Observaciones
                 </label>
                 <textarea
                   v-model="form.notas"
-                  class="form-control"
+                  class="form-control bg-light border-0 rounded-4 focus-ring-none p-3"
                   rows="3"
-                  placeholder="Observaciones, alergias, preferencias..."
+                  placeholder="Observaciones, alergias, preferencias del cliente..."
                   :class="{ 'is-invalid': form.errors.notas }"
                 ></textarea>
                 <div v-if="form.errors.notas" class="invalid-feedback">
@@ -251,17 +243,17 @@ onMounted(() => {
 
         </div>
 
-        <!-- Botones -->
-        <div class="d-flex justify-content-end gap-2 mt-4">
-          <a href="/agendas" class="btn btn-secondary">
+        <div class="d-flex justify-content-end align-items-center gap-3 mt-4 mb-5">
+          <Link href="/agendas" class="btn btn-light rounded-pill px-4 fw-medium text-muted">
             <i class="fas fa-times me-2"></i> Cancelar
-          </a>
+          </Link>
           <button
             type="submit"
-            class="btn btn-primary"
+            class="btn btn-brand rounded-pill px-4 shadow-sm fw-medium"
             :disabled="form.processing"
           >
-            <i class="fas fa-save me-2"></i>
+            <i v-if="form.processing" class="fas fa-spinner fa-spin me-2"></i>
+            <i v-else class="fas fa-save me-2"></i>
             {{ form.processing ? 'Guardando...' : 'Guardar Agenda' }}
           </button>
         </div>
@@ -273,10 +265,86 @@ onMounted(() => {
 </template>
 
 <style scoped>
-    .card {
-     transition: transform 0.2s;
-    }
-    .card:hover {
-        transform: translateY(-2px);
-    }
+/* Variables y colores corporativos (Igual que index) */
+.brand-accent {
+  color: #d84b72;
+}
+
+.btn-brand {
+  background-color: #d84b72;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-brand:hover:not(:disabled) {
+  background-color: #c03d61;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(216, 75, 114, 0.3) !important;
+}
+
+.btn-brand:disabled {
+  background-color: #e587a1;
+  border-color: #e587a1;
+  cursor: not-allowed;
+}
+
+/* Hover de tarjetas */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.08) !important;
+}
+
+/* Quitar bordes feos al hacer focus */
+.focus-ring-none:focus {
+  box-shadow: none;
+  border-color: #dee2e6;
+  background-color: #fff !important;
+}
+
+/* Tabla de servicios seleccionados */
+.custom-table th {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+.bg-secondary-subtle { background-color: #e2e3e5 !important; }
+
+/* Estilos sobreescritos para integrar Select2 con la línea de diseño
+  (Fondo claro, sin bordes agresivos y redondeado)
+*/
+:deep(.select2-container--default .select2-selection--single),
+:deep(.select2-container--default .select2-selection--multiple) {
+  background-color: #f8f9fa; /* bg-light de Bootstrap */
+  border: 1px solid transparent;
+  border-radius: 0.5rem; /* rounded-3 */
+  min-height: 42px;
+  padding: 4px 8px;
+}
+
+:deep(.select2-container--default.select2-container--focus .select2-selection--multiple),
+:deep(.select2-container--default.select2-container--focus .select2-selection--single) {
+  background-color: #fff;
+  border-color: #dee2e6;
+}
+
+:deep(.select2-container--default .select2-selection--single .select2-selection__rendered) {
+  line-height: 32px;
+  color: #212529;
+}
+
+:deep(.select2-container--default .select2-selection--single .select2-selection__arrow) {
+  height: 40px;
+}
+
+:deep(.select2-container--default .select2-selection--multiple .select2-selection__choice) {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-top: 4px;
+}
 </style>
