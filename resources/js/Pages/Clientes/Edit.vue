@@ -1,5 +1,5 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3'
+import { useForm, Link } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 
 const props = defineProps({
@@ -26,42 +26,39 @@ function submit() {
 
 <template>
   <AdminLayout title="Editar Cliente">
-    <div class="container-fluid px-3">
+    <div class="container-fluid px-0 px-md-3">
 
-      <!-- Header -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h4 text-primary fw-bold">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <h1 class="h4 brand-accent fw-bold mb-0">
           <i class="fas fa-user-edit me-2"></i> Editar Cliente #{{ cliente.id }}
         </h1>
-        <a href="/clientes" class="btn btn-secondary">
+        <Link href="/clientes" class="btn btn-light rounded-pill px-4 shadow-sm text-muted fw-medium">
           <i class="fas fa-arrow-left me-2"></i> Volver
-        </a>
+        </Link>
       </div>
 
-      <!-- Formulario -->
       <form @submit.prevent="submit">
-        <div class="row g-3">
+        <div class="row g-4">
 
-          <!-- Información Personal -->
-          <div class="col-12">
-            <div class="card shadow-sm border-0">
-              <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                  <i class="fas fa-user me-2"></i> Información Personal
+          <div class="col-lg-8">
+
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+              <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                <h5 class="mb-0 fw-bold text-dark">
+                  <i class="fas fa-user brand-accent me-2"></i> Información Personal
                 </h5>
               </div>
-              <div class="card-body">
-                <div class="row g-3">
+              <div class="card-body p-4">
+                <div class="row g-4">
 
-                  <!-- Nombre -->
                   <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-signature text-primary me-2"></i> Nombre *
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide mb-2">
+                      <i class="fas fa-signature text-secondary me-1"></i> Nombre *
                     </label>
-                    <input 
-                      type="text" 
-                      v-model="form.nombre" 
-                      class="form-control"
+                    <input
+                      type="text"
+                      v-model="form.nombre"
+                      class="form-control rounded-3 py-2 custom-input"
                       :class="{ 'is-invalid': form.errors.nombre }"
                       required
                     >
@@ -70,15 +67,14 @@ function submit() {
                     </div>
                   </div>
 
-                  <!-- Apellido -->
                   <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-signature text-primary me-2"></i> Apellido *
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide mb-2">
+                      <i class="fas fa-signature text-secondary me-1"></i> Apellido *
                     </label>
-                    <input 
-                      type="text" 
-                      v-model="form.apellido" 
-                      class="form-control"
+                    <input
+                      type="text"
+                      v-model="form.apellido"
+                      class="form-control rounded-3 py-2 custom-input"
                       :class="{ 'is-invalid': form.errors.apellido }"
                       required
                     >
@@ -87,15 +83,14 @@ function submit() {
                     </div>
                   </div>
 
-                  <!-- Fecha Nacimiento -->
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-birthday-cake text-info me-2"></i> Fecha de Nacimiento
+                  <div class="col-md-6">
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide mb-2">
+                      <i class="fas fa-birthday-cake text-secondary me-1"></i> Fecha de Nacimiento
                     </label>
-                    <input 
-                      type="date" 
-                      v-model="form.fecha_nacimiento" 
-                      class="form-control"
+                    <input
+                      type="date"
+                      v-model="form.fecha_nacimiento"
+                      class="form-control rounded-3 py-2 custom-input"
                       :class="{ 'is-invalid': form.errors.fecha_nacimiento }"
                       :max="new Date().toISOString().split('T')[0]"
                     >
@@ -104,14 +99,13 @@ function submit() {
                     </div>
                   </div>
 
-                  <!-- Género -->
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-venus-mars text-secondary me-2"></i> Género
+                  <div class="col-md-6">
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide mb-2">
+                      <i class="fas fa-venus-mars text-secondary me-1"></i> Género
                     </label>
-                    <select 
-                      v-model="form.genero" 
-                      class="form-select"
+                    <select
+                      v-model="form.genero"
+                      class="form-select rounded-3 py-2 custom-input"
                       :class="{ 'is-invalid': form.errors.genero }"
                     >
                       <option value="">Seleccionar...</option>
@@ -125,49 +119,27 @@ function submit() {
                     </div>
                   </div>
 
-                  <!-- Marketing -->
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold d-block">
-                      <i class="fas fa-bullhorn text-warning me-2"></i> Marketing
-                    </label>
-                    <div class="form-check form-switch mt-2">
-                      <input 
-                        class="form-check-input" 
-                        type="checkbox" 
-                        v-model="form.acepta_marketing"
-                        id="acepta_marketing"
-                      >
-                      <label class="form-check-label" for="acepta_marketing">
-                        Acepta recibir promociones
-                      </label>
-                    </div>
-                  </div>
-
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Información de Contacto -->
-          <div class="col-12">
-            <div class="card shadow-sm border-0">
-              <div class="card-header bg-success text-white">
-                <h5 class="mb-0">
-                  <i class="fas fa-address-book me-2"></i> Información de Contacto
+            <div class="card shadow-sm border-0 rounded-4">
+              <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                <h5 class="mb-0 fw-bold text-dark">
+                  <i class="fas fa-address-book brand-accent me-2"></i> Información de Contacto
                 </h5>
               </div>
-              <div class="card-body">
-                <div class="row g-3">
+              <div class="card-body p-4">
+                <div class="row g-4">
 
-                  <!-- Email -->
                   <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-envelope text-primary me-2"></i> Email
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide mb-2">
+                      <i class="fas fa-envelope text-secondary me-1"></i> Email
                     </label>
-                    <input 
-                      type="email" 
-                      v-model="form.email" 
-                      class="form-control"
+                    <input
+                      type="email"
+                      v-model="form.email"
+                      class="form-control rounded-3 py-2 custom-input"
                       :class="{ 'is-invalid': form.errors.email }"
                     >
                     <div v-if="form.errors.email" class="invalid-feedback">
@@ -175,15 +147,14 @@ function submit() {
                     </div>
                   </div>
 
-                  <!-- Teléfono -->
                   <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-phone text-success me-2"></i> Teléfono
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide mb-2">
+                      <i class="fas fa-phone text-secondary me-1"></i> Teléfono
                     </label>
-                    <input 
-                      type="text" 
-                      v-model="form.telefono" 
-                      class="form-control"
+                    <input
+                      type="text"
+                      v-model="form.telefono"
+                      class="form-control rounded-3 py-2 custom-input"
                       :class="{ 'is-invalid': form.errors.telefono }"
                     >
                     <div v-if="form.errors.telefono" class="invalid-feedback">
@@ -191,14 +162,13 @@ function submit() {
                     </div>
                   </div>
 
-                  <!-- Dirección -->
                   <div class="col-12">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-map-marker-alt text-danger me-2"></i> Dirección
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide mb-2">
+                      <i class="fas fa-map-marker-alt text-secondary me-1"></i> Dirección
                     </label>
-                    <textarea 
-                      v-model="form.direccion" 
-                      class="form-control" 
+                    <textarea
+                      v-model="form.direccion"
+                      class="form-control rounded-3 py-2 custom-input"
                       rows="2"
                       :class="{ 'is-invalid': form.errors.direccion }"
                     ></textarea>
@@ -210,80 +180,105 @@ function submit() {
                 </div>
               </div>
             </div>
+
           </div>
 
-          <!-- Puntos de Fidelidad -->
-          <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-              <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0">
-                  <i class="fas fa-star me-2"></i> Puntos de Fidelidad
+          <div class="col-lg-4">
+
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+              <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                <h5 class="mb-0 fw-bold text-dark">
+                  <i class="fas fa-star brand-accent me-2"></i> Fidelidad
                 </h5>
               </div>
-              <div class="card-body">
-                <label class="form-label fw-semibold">
-                  Puntos Actuales
-                </label>
-                <input 
-                  type="number" 
-                  v-model="form.puntos_fidelidad" 
-                  class="form-control"
-                  :class="{ 'is-invalid': form.errors.puntos_fidelidad }"
-                  min="0"
-                >
-                <div v-if="form.errors.puntos_fidelidad" class="invalid-feedback">
-                  {{ form.errors.puntos_fidelidad }}
+              <div class="card-body p-4">
+
+                <div class="mb-4">
+                  <label class="form-label text-muted small fw-bold text-uppercase tracking-wide mb-2">
+                    Puntos Actuales
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 custom-input">
+                      <i class="fas fa-award text-warning"></i>
+                    </span>
+                    <input
+                      type="number"
+                      v-model="form.puntos_fidelidad"
+                      class="form-control border-start-0 rounded-end-3 py-2 custom-input ps-0"
+                      :class="{ 'is-invalid': form.errors.puntos_fidelidad }"
+                      min="0"
+                    >
+                  </div>
+                  <div v-if="form.errors.puntos_fidelidad" class="invalid-feedback d-block">
+                    {{ form.errors.puntos_fidelidad }}
+                  </div>
                 </div>
-                <small class="text-muted">
-                  Los puntos pueden ser canjeados por descuentos o servicios
-                </small>
+
+                <div class="p-3 bg-brand-subtle rounded-4 border border-white">
+                  <label class="form-label brand-accent small fw-bold text-uppercase tracking-wide d-block mb-2">
+                    <i class="fas fa-bullhorn me-1"></i> Marketing
+                  </label>
+                  <div class="form-check form-switch mt-2 ml-2 mb-0">
+                    <input
+                      class="form-check-input custom-switch"
+                      type="checkbox"
+                      v-model="form.acepta_marketing"
+                      id="acepta_marketing"
+                      role="switch"
+                    >
+                    <label class="form-check-label text-dark fw-medium ms-3" for="acepta_marketing">
+                      Acepta promociones
+                    </label>
+                  </div>
+                </div>
+
               </div>
             </div>
-          </div>
 
-          <!-- Notas -->
-          <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-              <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0">
-                  <i class="fas fa-sticky-note me-2"></i> Notas Adicionales
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+              <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                <h5 class="mb-0 fw-bold text-dark">
+                  <i class="fas fa-sticky-note text-secondary me-2"></i> Notas Adicionales
                 </h5>
               </div>
-              <div class="card-body">
-                <label class="form-label fw-semibold">
+              <div class="card-body p-4">
+                <label class="form-label text-muted small fw-bold text-uppercase tracking-wide mb-2">
                   Observaciones
                 </label>
-                <textarea 
-                  v-model="form.notas" 
-                  class="form-control" 
-                  rows="3"
+                <textarea
+                  v-model="form.notas"
+                  class="form-control rounded-3 py-2 custom-input"
+                  rows="4"
                   :class="{ 'is-invalid': form.errors.notas }"
-                  placeholder="Alergias, preferencias, observaciones especiales..."
+                  placeholder="Alergias, preferencias de servicio..."
                 ></textarea>
                 <div v-if="form.errors.notas" class="invalid-feedback">
                   {{ form.errors.notas }}
                 </div>
               </div>
             </div>
+
+            <div class="d-flex flex-column gap-3">
+              <button
+                type="submit"
+                class="btn btn-brand rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center"
+                :disabled="form.processing"
+              >
+                <i class="fas fa-save me-2"></i>
+                {{ form.processing ? 'Guardando...' : 'Actualizar Cliente' }}
+              </button>
+
+              <Link
+                href="/clientes"
+                class="btn btn-light rounded-pill py-3 fw-medium d-flex align-items-center justify-content-center border"
+              >
+                <i class="fas fa-times me-2"></i> Cancelar
+              </Link>
+            </div>
+
           </div>
 
         </div>
-
-        <!-- Botones -->
-        <div class="d-flex justify-content-end gap-2 mt-4">
-          <a href="/clientes" class="btn btn-secondary">
-            <i class="fas fa-times me-2"></i> Cancelar
-          </a>
-          <button 
-            type="submit" 
-            class="btn btn-primary"
-            :disabled="form.processing"
-          >
-            <i class="fas fa-save me-2"></i>
-            {{ form.processing ? 'Guardando...' : 'Actualizar Cliente' }}
-          </button>
-        </div>
-
       </form>
 
     </div>
@@ -291,11 +286,69 @@ function submit() {
 </template>
 
 <style scoped>
-.card {
-  transition: transform 0.2s;
+/* Variables y colores corporativos */
+.brand-accent {
+  color: #d84b72;
 }
 
-.card:hover {
+.bg-brand-subtle {
+  background-color: #fce8ee;
+}
+
+.btn-brand {
+  background-color: #d84b72;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-brand:hover {
+  background-color: #c03d61;
+  color: white;
   transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(216, 75, 114, 0.3) !important;
+}
+
+/* Hover de tarjetas */
+.card {
+  transition: box-shadow 0.2s ease;
+}
+.card:hover {
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.08) !important;
+}
+
+/* Tipografía de apoyo */
+.tracking-wide {
+  letter-spacing: 0.05em;
+}
+
+/* Inputs personalizados */
+.custom-input {
+  border-color: #e2e3e5;
+  transition: all 0.2s ease;
+}
+
+.custom-input:focus, .input-group:focus-within .custom-input {
+  border-color: #d84b72;
+  box-shadow: none; /* Se maneja en el elemento padre si es necesario, o se deja limpio */
+}
+
+input.custom-input:focus, textarea.custom-input:focus, select.custom-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(216, 75, 114, 0.25);
+}
+
+/* Switch de Marketing */
+.custom-switch {
+  cursor: pointer;
+  height: 1.5em;
+  width: 3em;
+}
+
+.custom-switch:checked {
+  background-color: #d84b72;
+  border-color: #d84b72;
+}
+
+.custom-switch:focus {
+  box-shadow: 0 0 0 0.25rem rgba(216, 75, 114, 0.25);
 }
 </style>
