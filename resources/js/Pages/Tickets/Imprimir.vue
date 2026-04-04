@@ -6,17 +6,26 @@ const props = defineProps({
   ticket: Object
 })
 
-// Función para imprimir
+// Helper de Moneda para mantener consistencia
+const formatoMoneda = (valor) => {
+  if (valor === undefined || valor === null) return '$0.00'
+  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(valor)
+}
+
 const handlePrint = () => {
   window.print()
 }
 
-// Función para cerrar
 const handleClose = () => {
   window.close()
 }
 
 onMounted(() => {
+  // Escucha cuando el diálogo de impresión se cierra (ya sea por imprimir o cancelar)
+  window.onafterprint = () => {
+    window.close()
+  }
+
   // Auto-imprimir cuando carga la página
   setTimeout(() => {
     window.print()
@@ -25,12 +34,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <Head :title="`Ticket ${ticket.numero_ticket}`" />
+  <Head :title="`Ticket #${ticket.numero_ticket}`" />
 
   <div class="ticket-container">
     <div class="ticket">
 
-      <!-- Header / Logo -->
       <div class="header">
         <h1 class="business-name">TU NEGOCIO</h1>
         <p class="business-info">
@@ -40,116 +48,105 @@ onMounted(() => {
         </p>
       </div>
 
-      <!-- Separador -->
-      <div class="separator">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+      <div class="divider"></div>
 
-      <!-- Información del Ticket -->
       <div class="ticket-info">
         <p class="ticket-number">
-          <strong>{{ ticket.numero_ticket }}</strong>
+          <strong>Folio: {{ ticket.numero_ticket }}</strong>
         </p>
         <p class="ticket-date">{{ ticket.fecha }}</p>
       </div>
 
-      <!-- Cliente y Empleado -->
       <div class="info-section">
         <p>
-          <strong>Cliente:</strong> {{ ticket.cliente }}
+          <strong>Cliente:</strong> {{ typeof ticket.cliente === 'object' ? ticket.cliente?.nombre_completo : ticket.cliente || 'General' }}
         </p>
         <p>
-          <strong>Atendió:</strong> {{ ticket.empleado }}
+          <strong>Atendió:</strong> {{ typeof ticket.empleado === 'object' ? ticket.empleado?.nombre_completo : ticket.empleado || 'Cajero' }}
         </p>
       </div>
 
-      <!-- Separador -->
-      <div class="separator">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+      <div class="divider"></div>
 
-      <!-- Detalle de Items -->
       <div class="items-section">
         <table class="items-table">
           <thead>
             <tr>
-              <th class="text-left">Descripción</th>
-              <th class="text-center">Cant</th>
-              <th class="text-right">Precio</th>
-              <th class="text-right">Total</th>
+              <th class="text-left">CANT/DESC</th>
+              <th class="text-right">IMPORTE</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(detalle, index) in ticket.detalles" :key="index">
-              <td class="text-left item-name">{{ detalle.nombre }}</td>
-              <td class="text-center">{{ detalle.cantidad }}</td>
-              <td class="text-right">${{ detalle.precio_unitario }}</td>
-              <td class="text-right">${{ detalle.subtotal }}</td>
+            <tr v-for="detalle in ticket.detalles" :key="detalle.id">
+              <td class="text-left item-cell">
+                <div class="item-name">{{ detalle.nombre }}</div>
+                <div class="item-qty">{{ detalle.cantidad }} x {{ formatoMoneda(detalle.precio_unitario) }}</div>
+              </td>
+              <td class="text-right vertical-bottom">
+                {{ formatoMoneda(detalle.subtotal) }}
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Separador -->
-      <div class="separator">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+      <div class="divider"></div>
 
-      <!-- Totales -->
       <div class="totals-section">
         <div class="total-row">
           <span>Subtotal:</span>
-          <span>${{ ticket.subtotal }}</span>
+          <span>{{ formatoMoneda(ticket.subtotal) }}</span>
         </div>
 
         <div class="total-row" v-if="parseFloat(ticket.descuento) > 0">
           <span>Descuento:</span>
-          <span class="text-danger">-${{ ticket.descuento }}</span>
+          <span class="text-danger">-{{ formatoMoneda(ticket.descuento) }}</span>
         </div>
 
         <div class="total-row">
           <span>IVA (16%):</span>
-          <span>${{ ticket.impuesto }}</span>
+          <span>{{ formatoMoneda(ticket.impuesto) }}</span>
         </div>
 
-        <div class="separator-line"></div>
+        <div class="divider-dashed"></div>
 
         <div class="total-row total-final">
           <span>TOTAL:</span>
-          <span>${{ ticket.total }}</span>
+          <span>{{ formatoMoneda(ticket.total) }}</span>
         </div>
       </div>
 
-      <!-- Método de Pago -->
       <div class="payment-section">
         <p>
-          <strong>Método de pago:</strong>
-          <span class="text-uppercase">{{ ticket.metodo_pago }}</span>
+          Pago en: <span class="text-uppercase fw-bold">{{ ticket.metodo_pago }}</span>
         </p>
       </div>
 
-      <!-- Separador -->
-      <div class="separator">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+      <div class="divider"></div>
 
-      <!-- Footer -->
       <div class="footer">
         <p class="thanks">¡Gracias por su compra!</p>
         <p class="small-text">
           Conserve este ticket como comprobante<br>
-          de su compra
+          de su transacción.
         </p>
       </div>
 
     </div>
 
-    <!-- Botones de control (solo en pantalla) -->
     <div class="no-print controls">
-      <button @click="handlePrint" class="btn btn-primary">
-        <i class="fas fa-print"></i> Imprimir
+      <button @click="handlePrint" class="btn btn-brand rounded-pill px-4">
+        <i class="fas fa-print me-2"></i> Imprimir
       </button>
-      <button @click="handleClose" class="btn btn-secondary">
-        <i class="fas fa-times"></i> Cerrar
+      <button @click="handleClose" class="btn btn-light border rounded-pill px-4">
+        <i class="fas fa-times me-2"></i> Cerrar
       </button>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* Estilos generales */
+/* Estilos generales de la vista (Pantalla) */
 * {
   margin: 0;
   padding: 0;
@@ -157,225 +154,189 @@ onMounted(() => {
 }
 
 body {
-  font-family: 'Courier New', monospace;
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
 }
 
+/* Tipografía optimizada para tickets */
 .ticket-container {
-  max-width: 350px;
-  margin: 20px auto;
+  font-family: 'Courier New', Courier, monospace;
+  max-width: 380px;
+  margin: 40px auto;
   padding: 20px;
+  color: #000;
 }
 
 .ticket {
   background: white;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
+  padding: 30px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
 }
 
 /* Header */
 .header {
   text-align: center;
-  margin-bottom: 15px;
 }
 
 .business-name {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: bold;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  font-family: Arial, sans-serif; /* A veces el logo/nombre se ve mejor en Sans-serif */
 }
 
 .business-info {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.4;
-  color: #555;
 }
 
-/* Separadores */
-.separator {
-  text-align: center;
-  font-size: 10px;
-  color: #999;
-  margin: 10px 0;
-  letter-spacing: -1px;
+/* Separadores CSS (Mejor que texto para impresoras térmicas) */
+.divider {
+  border-top: 1px solid #000;
+  margin: 12px 0;
 }
 
-.separator-line {
-  border-top: 1px dashed #999;
+.divider-dashed {
+  border-top: 1px dashed #000;
   margin: 8px 0;
 }
 
 /* Información del Ticket */
 .ticket-info {
   text-align: center;
-  margin-bottom: 10px;
 }
 
 .ticket-number {
   font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 5px;
 }
 
 .ticket-date {
-  font-size: 11px;
-  color: #666;
+  font-size: 12px;
+  margin-top: 2px;
 }
 
 /* Sección de información */
 .info-section {
-  margin-bottom: 10px;
   font-size: 12px;
   line-height: 1.6;
 }
 
-.info-section p {
-  margin-bottom: 3px;
-}
-
-/* Tabla de items */
-.items-section {
-  margin: 10px 0;
-}
-
+/* Tabla de items (Optimizada a 2 columnas para 58mm y 80mm) */
 .items-table {
   width: 100%;
-  font-size: 11px;
+  font-size: 12px;
   border-collapse: collapse;
 }
 
 .items-table th {
-  padding: 5px 2px;
-  border-bottom: 1px solid #333;
-  font-weight: bold;
-  font-size: 10px;
+  padding: 4px 0;
+  border-bottom: 1px solid #000;
+  font-size: 11px;
 }
 
-.items-table td {
-  padding: 5px 2px;
-  border-bottom: 1px dashed #ddd;
+.item-cell {
+  padding: 8px 0;
+  border-bottom: 1px dashed #ccc;
+}
+
+.vertical-bottom {
+  vertical-align: bottom;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #ccc;
+}
+
+.item-name {
+  font-weight: bold;
+  word-wrap: break-word;
+  line-height: 1.2;
+}
+
+.item-qty {
+  font-size: 11px;
+  margin-top: 3px;
 }
 
 .items-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.item-name {
-  max-width: 150px;
-  word-wrap: break-word;
-  line-height: 1.3;
-}
-
-.text-left {
-  text-align: left;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.text-right {
-  text-align: right;
-}
+.text-left { text-align: left; }
+.text-right { text-align: right; }
 
 /* Totales */
 .totals-section {
-  margin: 10px 0;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .total-row {
   display: flex;
   justify-content: space-between;
-  padding: 3px 0;
+  padding: 2px 0;
 }
 
 .total-final {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   margin-top: 5px;
 }
 
-.text-danger {
-  color: #dc3545;
-}
+/* Utilidades */
+.text-uppercase { text-transform: uppercase; }
+.fw-bold { font-weight: bold; }
 
 /* Pago */
 .payment-section {
   text-align: center;
-  margin: 10px 0;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 /* Footer */
 .footer {
   text-align: center;
-  margin-top: 15px;
 }
 
 .thanks {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: bold;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
 }
 
 .small-text {
-  font-size: 10px;
-  color: #666;
+  font-size: 11px;
   line-height: 1.4;
 }
 
-/* Controles */
+/* Controles de UI (Pantalla) */
 .controls {
-  text-align: center;
-  margin-top: 20px;
+  margin-top: 30px;
   display: flex;
   gap: 10px;
   justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.btn {
+.btn-brand {
+  background-color: #d84b72;
+  border: 1px solid #d84b72;
+  color: white;
   padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
-  font-family: Arial, sans-serif;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s;
+  transition: all 0.2s;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  color: white;
+.btn-brand:hover {
+  background-color: #c03e61;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background-color: #545b62;
-}
-
-/* Estilos de impresión */
+/* Reglas de Impresión */
 @media print {
   body {
-    background: white;
+    background: transparent;
   }
 
   .ticket-container {
-    max-width: 80mm;
+    max-width: 80mm; /* Tamaño estándar grande */
     margin: 0;
     padding: 0;
   }
@@ -383,75 +344,30 @@ body {
   .ticket {
     box-shadow: none;
     border-radius: 0;
-    padding: 5mm;
+    padding: 0;
+    border: none;
   }
 
   .no-print {
     display: none !important;
   }
 
-  /* Ajustes para ticket térmico */
-  .business-name {
-    font-size: 18px;
-  }
-
-  .business-info {
-    font-size: 9px;
-  }
-
-  .separator {
-    font-size: 8px;
-  }
-
-  .ticket-info,
-  .info-section,
-  .payment-section {
-    font-size: 10px;
-  }
-
-  .items-table {
-    font-size: 9px;
-  }
-
-  .items-table th {
-    font-size: 8px;
-  }
-
+  .ticket-container,
+  .items-table,
   .totals-section {
-    font-size: 10px;
-  }
-
-  .total-final {
-    font-size: 14px;
-  }
-
-  .thanks {
-    font-size: 12px;
-  }
-
-  .small-text {
-    font-size: 8px;
-  }
-
-  /* Evitar saltos de página innecesarios */
-  .ticket {
-    page-break-inside: avoid;
+    color: #000; /* Asegura contraste en térmico */
   }
 }
 
-/* Para impresoras de 58mm */
+/* Ajustes finos para impresoras de 58mm */
 @media print and (max-width: 58mm) {
   .ticket-container {
     max-width: 58mm;
   }
 
-  .business-name {
-    font-size: 16px;
-  }
-
-  .items-table th:nth-child(3),
-  .items-table td:nth-child(3) {
-    display: none; /* Ocultar precio unitario en tickets pequeños */
-  }
+  .business-name { font-size: 18px; }
+  .items-table { font-size: 10px; }
+  .item-qty { font-size: 9px; }
+  .total-final { font-size: 15px; }
 }
 </style>
