@@ -1,5 +1,5 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3'
+import { useForm, Link } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 
 const props = defineProps({
@@ -32,42 +32,37 @@ function submit() {
 
 <template>
   <AdminLayout title="Editar Empleado">
-    <div class="container-fluid px-3">
+    <div class="container-fluid px-0 px-md-3">
 
-      <!-- Header -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h4 text-primary fw-bold">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <h1 class="h4 brand-accent fw-bold mb-0">
           <i class="fas fa-user-edit me-2"></i> Editar Empleado #{{ empleado.id }}
         </h1>
-        <a href="/empleados" class="btn btn-secondary">
-          <i class="fas fa-arrow-left me-2"></i> Volver
-        </a>
+        <Link href="/empleados" class="btn btn-light border rounded-pill px-3 shadow-sm text-muted fw-medium">
+          <i class="fas fa-arrow-left me-1"></i> Volver al listado
+        </Link>
       </div>
 
-      <!-- Formulario -->
       <form @submit.prevent="submit">
-        <div class="row g-3">
+        <div class="row g-4">
 
-          <!-- Información Personal -->
-          <div class="col-12">
-            <div class="card shadow-sm border-0">
-              <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                  <i class="fas fa-user me-2"></i> Información Personal
+          <div class="col-lg-8">
+
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+              <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                <h5 class="mb-0 fw-bold text-dark">
+                  <i class="fas fa-id-card brand-accent me-2"></i> Información Personal
                 </h5>
               </div>
-              <div class="card-body">
+              <div class="card-body p-4">
                 <div class="row g-3">
 
-                  <!-- Nombre -->
                   <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-signature text-primary me-2"></i> Nombre *
-                    </label>
-                    <input 
-                      type="text" 
-                      v-model="form.nombre" 
-                      class="form-control"
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Nombre *</label>
+                    <input
+                      type="text"
+                      v-model="form.nombre"
+                      class="form-control form-control-lg bg-light border-0 fs-6"
                       :class="{ 'is-invalid': form.errors.nombre }"
                       required
                     >
@@ -76,15 +71,12 @@ function submit() {
                     </div>
                   </div>
 
-                  <!-- Apellido -->
                   <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-signature text-primary me-2"></i> Apellido *
-                    </label>
-                    <input 
-                      type="text" 
-                      v-model="form.apellido" 
-                      class="form-control"
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Apellido *</label>
+                    <input
+                      type="text"
+                      v-model="form.apellido"
+                      class="form-control form-control-lg bg-light border-0 fs-6"
                       :class="{ 'is-invalid': form.errors.apellido }"
                       required
                     >
@@ -93,46 +85,43 @@ function submit() {
                     </div>
                   </div>
 
-                  <!-- Email -->
                   <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-envelope text-info me-2"></i> Email
-                    </label>
-                    <input 
-                      type="email" 
-                      v-model="form.email" 
-                      class="form-control"
-                      :class="{ 'is-invalid': form.errors.email }"
-                    >
-                    <div v-if="form.errors.email" class="invalid-feedback">
-                      {{ form.errors.email }}
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Email</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light border-0 text-muted"><i class="fas fa-envelope"></i></span>
+                      <input
+                        type="email"
+                        v-model="form.email"
+                        class="form-control form-control-lg bg-light border-0 fs-6 ps-0"
+                        :class="{ 'is-invalid': form.errors.email }"
+                      >
+                      <div v-if="form.errors.email" class="invalid-feedback">
+                        {{ form.errors.email }}
+                      </div>
                     </div>
                   </div>
 
-                  <!-- Teléfono -->
                   <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-phone text-success me-2"></i> Teléfono
-                    </label>
-                    <input 
-                      type="text" 
-                      v-model="form.telefono" 
-                      class="form-control"
-                      :class="{ 'is-invalid': form.errors.telefono }"
-                    >
-                    <div v-if="form.errors.telefono" class="invalid-feedback">
-                      {{ form.errors.telefono }}
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Teléfono</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light border-0 text-muted"><i class="fas fa-phone"></i></span>
+                      <input
+                        type="text"
+                        v-model="form.telefono"
+                        class="form-control form-control-lg bg-light border-0 fs-6 ps-0"
+                        :class="{ 'is-invalid': form.errors.telefono }"
+                      >
+                      <div v-if="form.errors.telefono" class="invalid-feedback">
+                        {{ form.errors.telefono }}
+                      </div>
                     </div>
                   </div>
 
-                  <!-- Dirección -->
                   <div class="col-12">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-map-marker-alt text-danger me-2"></i> Dirección
-                    </label>
-                    <textarea 
-                      v-model="form.direccion" 
-                      class="form-control" 
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Dirección</label>
+                    <textarea
+                      v-model="form.direccion"
+                      class="form-control form-control-lg bg-light border-0 fs-6"
                       rows="2"
                       :class="{ 'is-invalid': form.errors.direccion }"
                     ></textarea>
@@ -144,28 +133,22 @@ function submit() {
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Información Laboral -->
-          <div class="col-12">
-            <div class="card shadow-sm border-0">
-              <div class="card-header bg-success text-white">
-                <h5 class="mb-0">
-                  <i class="fas fa-briefcase me-2"></i> Información Laboral
+            <div class="card shadow-sm border-0 rounded-4">
+              <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                <h5 class="mb-0 fw-bold text-dark">
+                  <i class="fas fa-briefcase text-info me-2"></i> Perfil Laboral
                 </h5>
               </div>
-              <div class="card-body">
+              <div class="card-body p-4">
                 <div class="row g-3">
 
-                  <!-- Puesto -->
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-user-tie text-primary me-2"></i> Puesto *
-                    </label>
-                    <input 
-                      type="text" 
-                      v-model="form.puesto" 
-                      class="form-control"
+                  <div class="col-md-6">
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Puesto *</label>
+                    <input
+                      type="text"
+                      v-model="form.puesto"
+                      class="form-control form-control-lg bg-light border-0 fs-6"
                       :class="{ 'is-invalid': form.errors.puesto }"
                       list="puestos-list"
                       required
@@ -183,14 +166,11 @@ function submit() {
                     </div>
                   </div>
 
-                  <!-- Estado -->
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-flag text-warning me-2"></i> Estado *
-                    </label>
-                    <select 
-                      v-model="form.estado" 
-                      class="form-select"
+                  <div class="col-md-6">
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Estado *</label>
+                    <select
+                      v-model="form.estado"
+                      class="form-select form-select-lg bg-light border-0 fs-6"
                       :class="{ 'is-invalid': form.errors.estado }"
                       required
                     >
@@ -203,15 +183,12 @@ function submit() {
                     </div>
                   </div>
 
-                  <!-- Fecha Ingreso -->
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-calendar-check text-info me-2"></i> Fecha de Ingreso
-                    </label>
-                    <input 
-                      type="date" 
-                      v-model="form.fecha_ingreso" 
-                      class="form-control"
+                  <div class="col-md-6">
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Fecha de Ingreso</label>
+                    <input
+                      type="date"
+                      v-model="form.fecha_ingreso"
+                      class="form-control form-control-lg bg-light border-0 fs-6"
                       :class="{ 'is-invalid': form.errors.fecha_ingreso }"
                       :max="new Date().toISOString().split('T')[0]"
                     >
@@ -220,92 +197,12 @@ function submit() {
                     </div>
                   </div>
 
-                  <!-- Hora Entrada -->
-                  <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-clock text-success me-2"></i> Hora de Entrada
-                    </label>
-                    <input 
-                      type="time" 
-                      v-model="form.hora_entrada" 
-                      class="form-control"
-                      :class="{ 'is-invalid': form.errors.hora_entrada }"
-                    >
-                    <div v-if="form.errors.hora_entrada" class="invalid-feedback">
-                      {{ form.errors.hora_entrada }}
-                    </div>
-                  </div>
-
-                  <!-- Hora Salida -->
-                  <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-clock text-danger me-2"></i> Hora de Salida
-                    </label>
-                    <input 
-                      type="time" 
-                      v-model="form.hora_salida" 
-                      class="form-control"
-                      :class="{ 'is-invalid': form.errors.hora_salida }"
-                    >
-                    <div v-if="form.errors.hora_salida" class="invalid-feedback">
-                      {{ form.errors.hora_salida }}
-                    </div>
-                  </div>
-
-                  <!-- Días Laborales -->
-                  <div class="col-12">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-calendar-week text-warning me-2"></i> Días Laborales
-                    </label>
-                    <div class="d-flex flex-wrap gap-2">
-                      <div 
-                        v-for="dia in dias_semana" 
-                        :key="dia" 
-                        class="form-check form-check-inline"
-                      >
-                        <input 
-                          class="form-check-input" 
-                          type="checkbox" 
-                          :id="`dia-${dia}`"
-                          :value="dia"
-                          v-model="form.dias_laborales"
-                        >
-                        <label class="form-check-label" :for="`dia-${dia}`">
-                          {{ dia.charAt(0).toUpperCase() + dia.slice(1) }}
-                        </label>
-                      </div>
-                    </div>
-                    <div v-if="form.errors.dias_laborales" class="text-danger small mt-1">
-                      {{ form.errors.dias_laborales }}
-                    </div>
-                  </div>
-
-                  <!-- Especialidades -->
-                  <div class="col-12">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-star text-warning me-2"></i> Especialidades
-                    </label>
-                    <textarea 
-                      v-model="form.especialidades" 
-                      class="form-control" 
-                      rows="2"
-                      :class="{ 'is-invalid': form.errors.especialidades }"
-                      placeholder="Ej: Cortes clásicos, degradados, barbas, tintes..."
-                    ></textarea>
-                    <div v-if="form.errors.especialidades" class="invalid-feedback">
-                      {{ form.errors.especialidades }}
-                    </div>
-                  </div>
-
-                  <!-- Fecha Salida -->
                   <div class="col-md-6" v-if="form.estado === 'inactivo'">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-calendar-times text-danger me-2"></i> Fecha de Salida
-                    </label>
-                    <input 
-                      type="date" 
-                      v-model="form.fecha_salida" 
-                      class="form-control"
+                    <label class="form-label text-danger small fw-bold text-uppercase tracking-wide">Fecha de Salida</label>
+                    <input
+                      type="date"
+                      v-model="form.fecha_salida"
+                      class="form-control form-control-lg bg-light border-0 fs-6"
                       :class="{ 'is-invalid': form.errors.fecha_salida }"
                     >
                     <div v-if="form.errors.fecha_salida" class="invalid-feedback">
@@ -313,33 +210,107 @@ function submit() {
                     </div>
                   </div>
 
+                  <div class="col-12 mt-3">
+                    <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Especialidades</label>
+                    <textarea
+                      v-model="form.especialidades"
+                      class="form-control form-control-lg bg-light border-0 fs-6"
+                      rows="2"
+                      :class="{ 'is-invalid': form.errors.especialidades }"
+                    ></textarea>
+                    <div v-if="form.errors.especialidades" class="invalid-feedback">
+                      {{ form.errors.especialidades }}
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
+
           </div>
 
-          <!-- Compensación -->
-          <div class="col-12">
-            <div class="card shadow-sm border-0">
-              <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0">
-                  <i class="fas fa-money-bill-wave me-2"></i> Compensación
+          <div class="col-lg-4">
+
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+              <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                <h5 class="mb-0 fw-bold text-dark">
+                  <i class="fas fa-clock text-warning me-2"></i> Disponibilidad
                 </h5>
               </div>
-              <div class="card-body">
-                <div class="row g-3">
+              <div class="card-body p-4">
 
-                  <!-- Salario -->
-                  <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-dollar-sign text-success me-2"></i> Salario Base
-                    </label>
-                    <input 
-                      type="number" 
-                      v-model="form.salario" 
-                      class="form-control"
+                <div class="mb-4">
+                  <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Hora de Entrada</label>
+                  <input
+                    type="time"
+                    v-model="form.hora_entrada"
+                    class="form-control form-control-lg bg-light border-0 fs-6"
+                    :class="{ 'is-invalid': form.errors.hora_entrada }"
+                  >
+                  <div v-if="form.errors.hora_entrada" class="invalid-feedback">
+                    {{ form.errors.hora_entrada }}
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Hora de Salida</label>
+                  <input
+                    type="time"
+                    v-model="form.hora_salida"
+                    class="form-control form-control-lg bg-light border-0 fs-6"
+                    :class="{ 'is-invalid': form.errors.hora_salida }"
+                  >
+                  <div v-if="form.errors.hora_salida" class="invalid-feedback">
+                    {{ form.errors.hora_salida }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label text-muted small fw-bold text-uppercase tracking-wide mb-3">Días Laborales</label>
+                  <div class="d-flex flex-column gap-2">
+                    <div
+                      v-for="dia in dias_semana"
+                      :key="dia"
+                      class="form-check form-switch"
+                    >
+                      <input
+                        class="form-check-input custom-switch"
+                        type="checkbox"
+                        role="switch"
+                        :id="`dia-${dia}`"
+                        :value="dia"
+                        v-model="form.dias_laborales"
+                      >
+                      <label class="form-check-label ms-2 fw-medium" :for="`dia-${dia}`">
+                        {{ dia.charAt(0).toUpperCase() + dia.slice(1) }}
+                      </label>
+                    </div>
+                  </div>
+                  <div v-if="form.errors.dias_laborales" class="text-danger small mt-2">
+                    {{ form.errors.dias_laborales }}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-4">
+              <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                <h5 class="mb-0 fw-bold text-dark">
+                  <i class="fas fa-money-bill-wave text-success me-2"></i> Compensación
+                </h5>
+              </div>
+              <div class="card-body p-4">
+
+                <div class="mb-4">
+                  <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Salario Base</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light border-0 text-muted">$</span>
+                    <input
+                      type="number"
+                      v-model="form.salario"
+                      class="form-control form-control-lg bg-light border-0 fs-6 ps-0"
                       :class="{ 'is-invalid': form.errors.salario }"
-                      placeholder="0.00"
                       step="0.01"
                       min="0"
                     >
@@ -347,47 +318,49 @@ function submit() {
                       {{ form.errors.salario }}
                     </div>
                   </div>
+                </div>
 
-                  <!-- Comisión -->
-                  <div class="col-md-6">
-                    <label class="form-label fw-semibold">
-                      <i class="fas fa-percentage text-info me-2"></i> Comisión (%)
-                    </label>
-                    <input 
-                      type="number" 
-                      v-model="form.comision_porcentaje" 
-                      class="form-control"
+                <div class="mb-3">
+                  <label class="form-label text-muted small fw-bold text-uppercase tracking-wide">Comisión (%)</label>
+                  <div class="input-group">
+                    <input
+                      type="number"
+                      v-model="form.comision_porcentaje"
+                      class="form-control form-control-lg bg-light border-0 fs-6"
                       :class="{ 'is-invalid': form.errors.comision_porcentaje }"
-                      placeholder="0"
                       step="0.01"
                       min="0"
                       max="100"
                     >
+                    <span class="input-group-text bg-light border-0 text-muted"><i class="fas fa-percentage"></i></span>
                     <div v-if="form.errors.comision_porcentaje" class="invalid-feedback">
                       {{ form.errors.comision_porcentaje }}
                     </div>
-                    <small class="text-muted">Porcentaje de comisión sobre ventas</small>
                   </div>
-
                 </div>
+
               </div>
             </div>
+
           </div>
 
         </div>
 
-        <!-- Botones -->
-        <div class="d-flex justify-content-end gap-2 mt-4">
-          <a href="/empleados" class="btn btn-secondary">
-            <i class="fas fa-times me-2"></i> Cancelar
-          </a>
-          <button 
-            type="submit" 
-            class="btn btn-primary"
+        <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
+          <Link href="/empleados" class="btn btn-light rounded-pill px-4 fw-medium shadow-sm">
+            Cancelar
+          </Link>
+          <button
+            type="submit"
+            class="btn btn-brand rounded-pill px-4 fw-medium shadow-sm"
             :disabled="form.processing"
           >
-            <i class="fas fa-save me-2"></i>
-            {{ form.processing ? 'Guardando...' : 'Actualizar Empleado' }}
+            <span v-if="form.processing">
+              <i class="fas fa-spinner fa-spin me-2"></i> Guardando...
+            </span>
+            <span v-else>
+              <i class="fas fa-save me-2"></i> Actualizar Empleado
+            </span>
           </button>
         </div>
 
@@ -398,16 +371,64 @@ function submit() {
 </template>
 
 <style scoped>
+/* Variables y colores corporativos */
+.brand-accent {
+  color: #d84b72;
+}
+
+.btn-brand {
+  background-color: #d84b72;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-brand:hover {
+  background-color: #c03d61;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(216, 75, 114, 0.3) !important;
+}
+
+/* Tipografía de apoyo */
+.tracking-wide {
+  letter-spacing: 0.05em;
+}
+
+/* Inputs y form controls */
+.form-control:focus, .form-select:focus {
+  box-shadow: 0 0 0 0.25rem rgba(216, 75, 114, 0.25);
+  border-color: #d84b72;
+  background-color: #fff !important;
+}
+
+/* Switches (Toggle) personalizados */
+.custom-switch:checked {
+  background-color: #d84b72;
+  border-color: #d84b72;
+}
+
+.custom-switch:focus {
+  box-shadow: 0 0 0 0.25rem rgba(216, 75, 114, 0.25);
+  border-color: #d84b72;
+}
+
+.form-switch .form-check-input {
+  width: 2.5em;
+  height: 1.25em;
+  cursor: pointer;
+}
+
+.form-check-label {
+  cursor: pointer;
+  padding-top: 0.15rem;
+}
+
+/* Hover de tarjetas */
 .card {
-  transition: transform 0.2s;
+  transition: box-shadow 0.2s ease;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-}
-
-.form-check-input:checked {
-  background-color: #28a745;
-  border-color: #28a745;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.08) !important;
 }
 </style>
